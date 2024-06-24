@@ -1,0 +1,10 @@
+{
+"SpaProxyServer": {
+"ServerUrl": "https://localhost:5173",
+"RedirectUrl": "",
+"LaunchCommand": "npm run dev",
+"WorkingDirectory": "C:\\Users\\fprev\\Documents\\Clienti\\Craon\\Trello\\Trello.Server\\..\\trello.client",
+"MaxTimeoutInSeconds": "120",
+"KeepRunning": "false"
+}
+}

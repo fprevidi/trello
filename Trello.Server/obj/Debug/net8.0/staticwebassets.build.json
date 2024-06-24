@@ -1,0 +1,31 @@
+{
+  "Version": 1,
+  "Hash": "F5gLWknk2VOR9/mLubhFHtYEv9wUAdo/2m3U8iFl9XQ=",
+  "Source": "Trello.Server",
+  "BasePath": "_content/Trello.Server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [
+    {
+      "Identity": "C:\\Users\\fprev\\Documents\\Clienti\\Craon\\Trello\\trello.client\\trello.client.esproj",
+      "Version": 2,
+      "Source": "trello.client",
+      "GetPublishAssetsTargets": "GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained"
+    }
+  ],
+  "DiscoveryPatterns": [
+    {
+      "Name": "Trello.Server\\wwwroot",
+      "Source": "Trello.Server",
+      "ContentRoot": "C:\\Users\\fprev\\Documents\\Clienti\\Craon\\Trello\\Trello.Server\\wwwroot\\",
+      "BasePath": "_content/Trello.Server",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": []
+}

@@ -4,4 +4,29 @@
     border-radius: 4px;
     padding: 1rem;
     margin: 0.5rem 0;
+    position: relative;
 }
+
+.card-content {
+    padding-right: 2rem; /* Space for delete icon */
+}
+
+.card h4 {
+    margin: 0 0 0.5rem 0;
+}
+
+.card p {
+    margin: 0;
+}
+
+.delete-icon {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    color: #dc3545;
+    cursor: pointer;
+}
+
+    .delete-icon:hover {
+        color: #a71d2a;
+    }

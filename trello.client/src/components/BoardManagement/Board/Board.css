@@ -1,45 +1,24 @@
 .board-container {
     padding: 2rem;
-    background-color: #ffffff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-    max-width: 1200px;
-    margin: 2rem auto;
+    background: linear-gradient(to right, #1e3c72, #2a5298); /* Gradiente blu */
+    height: 100vh;
+    overflow-y: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width:100%;
+}
+
+.new-list-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
 }
 
 .lists-container {
     display: flex;
     gap: 1rem;
     overflow-x: auto;
-}
-
-.add-list {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     padding: 1rem;
-    border: 2px dashed #ccc;
-    border-radius: 4px;
-    min-width: 200px;
+    width: 100%;
 }
-
-    .add-list input {
-        margin-bottom: 0.5rem;
-        padding: 0.5rem;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .add-list button {
-        padding: 0.5rem 1rem;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-        .add-list button:hover {
-            background-color: #0056b3;
-        }

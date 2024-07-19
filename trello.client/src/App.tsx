@@ -1,41 +1,39 @@
 import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Login from './components/Authentication/Login/Login';
+import Register from './components/Authentication/Register/Register';
+import Board from './components/BoardManagement/Board/Board';
+import NavBar from './components/Navigation/NavBar/NavBar';
+import SideBar from './components/Navigation/SideBar/SideBar';
 import './App.css';
-import Login from './components/Login/Login';
-import LayoutWithNavbar from './components/LayoutWithNavBar';
-import Home from './components/Home/Home';
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ProtectedRoute from './components/ProtectedRoute';
-
-
 
 const App: React.FC = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-        const authToken = localStorage.getItem('authToken');
-        return !!authToken; // Imposta isAuthenticated in base alla presenza del token
-    });
-    useEffect(() => {
-        const authToken = localStorage.getItem('authToken');
-        setIsAuthenticated(!!authToken);
-    }, []);
+    const handleLogin = (username: string, password: string) => {
+        console.log('Login', { username, password });
+    };
 
+    const handleRegister = (username: string, password: string, email: string) => {
+        console.log('Register', { username, password, email });
+    };
 
     return (
-           <Router>
-            <Routes>
-                <Route path="/" element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                        <LayoutWithNavbar>
-                            <Home />
-                        </LayoutWithNavbar>
-                    </ProtectedRoute>
-                } />
-                    <Route path="/Login" element={<Login onLoginSuccess={() => setIsAuthenticated(true)} onLoginFailure={() => setIsAuthenticated(false)} />} />
-                </Routes>
-          </Router>
+        <Router>
+            <div className="app">
+                <NavBar />
+                <div className="app-body">
+                    <SideBar />
+                    <div className="app-content">
+                        <Routes>
+                            <Route path="/" element={<Login onLogin={handleLogin} />} />
+                            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+                            <Route path="/register" element={<Register onRegister={handleRegister} />} />
+                            <Route path="/board" element={<Board />} />
+                        </Routes>
+                    </div>
+                </div>
+            </div>
+        </Router>
     );
-
-  
-}
+};
 
 export default App;

@@ -9,6 +9,13 @@
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="src\components\Home\" />
+    <Folder Include="src\components\BoardManagement\BoardList\" />
+    <Folder Include="src\components\CardManagement\CardDetails\" />
+    <Folder Include="src\components\CardManagement\CardEdit\" />
+    <Folder Include="src\components\ListManagement\ListHeader\" />
+    <Folder Include="src\components\Navigation\NavBar\" />
+    <Folder Include="src\components\Navigation\SideBar\" />
+    <Folder Include="src\components\UtilityComponents\Loader\" />
+    <Folder Include="src\components\UtilityComponents\Notification\" />
   </ItemGroup>
 </Project>

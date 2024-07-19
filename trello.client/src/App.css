@@ -17,3 +17,22 @@ th, td {
     padding-left: 1rem;
     padding-right: 1rem;
 }
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.app-body {
+    display: flex;
+    flex: 1;
+}
+
+.app-content {
+    flex: 1;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to right, #1e3c72, #2a5298); /* Gradiente blu */
+}

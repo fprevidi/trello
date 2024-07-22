@@ -48,11 +48,11 @@ const List: React.FC<ListProps> = ({
     return (
         <div className="list">
             <div className="list-header">
-                <button className="move-list-left" onClick={() => onMoveListLeft(listId)}>
+                <button className="arrow-button move-list-left" onClick={() => onMoveListLeft(listId)}>
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </button>
-                <h3>{title}</h3>
-                <button className="move-list-right" onClick={() => onMoveListRight(listId)}>
+                <h3 className="list-title">{title}</h3>
+                <button className="arrow-button move-list-right" onClick={() => onMoveListRight(listId)}>
                     <FontAwesomeIcon icon={faArrowRight} />
                 </button>
             </div>
@@ -87,28 +87,35 @@ const List: React.FC<ListProps> = ({
             </Droppable>
             <Button onClick={() => setIsModalOpen(true)} label="Aggiungi Card" />
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                <div className="modal-content">
-                    <h3>Nuova Card</h3>
-                    <input
-                        type="text"
-                        value={newCardTitle}
-                        onChange={(e) => setNewCardTitle(e.target.value)}
-                        placeholder="Titolo nuova card"
-                    />
-                    <textarea
-                        value={newCardDescription}
-                        onChange={(e) => setNewCardDescription(e.target.value)}
-                        placeholder="Descrizione nuova card"
-                    />
-                    <div className="modal-buttons">
-                        <Button onClick={handleAddCard} label="OK" />
-                        <Button onClick={() => setIsModalOpen(false)} label="Annulla" />
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>Nuova Card</h3>
+                        <input
+                            type="text"
+                            value={newCardTitle}
+                            onChange={(e) => setNewCardTitle(e.target.value)}
+                            placeholder="Titolo nuova card"
+                        />
+                        <textarea
+                            value={newCardDescription}
+                            onChange={(e) => setNewCardDescription(e.target.value)}
+                            placeholder="Descrizione nuova card"
+                        />
+                        <div className="modal-buttons">
+                            <Button onClick={handleAddCard} label="OK" />
+                            <Button onClick={() => setIsModalOpen(false)} label="Annulla" />
+                        </div>
                     </div>
                 </div>
             </Modal>
-            <button className="delete-list-button" onClick={() => onDeleteList(listId)}>
-                <FontAwesomeIcon icon={faTrash} />
-            </button>
+
+
+            <FontAwesomeIcon
+                icon={faTrash}
+                className="delete-icon"
+                onClick={() => onDeleteList(listId)}
+
+            />
         </div>
     );
 };

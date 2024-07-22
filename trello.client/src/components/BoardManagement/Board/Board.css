@@ -6,7 +6,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    width:100%;
+    width: 100%;
 }
 
 .new-list-button {
@@ -17,8 +17,8 @@
 
 .lists-container {
     display: flex;
-    gap: 1rem;
+    gap: 4px; /* Ridotto il gap tra le liste */
     overflow-x: auto;
-    padding: 1rem;
+    padding: 0.5rem;
     width: 100%;
 }

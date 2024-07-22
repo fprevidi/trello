@@ -143,9 +143,10 @@ const Board: React.FC = () => {
                         value={newListTitle}
                         onChange={(e) => setNewListTitle(e.target.value)}
                         placeholder="Titolo nuova lista"
+                        className="modal-input"
                     />
                     <div className="modal-buttons">
-                        <Button onClick={handleAddList} label="OK" />
+                        <Button onClick={handleAddList} label="OK" className="mr-4" />
                         <Button onClick={() => setIsModalOpen(false)} label="Annulla" />
                     </div>
                 </div>

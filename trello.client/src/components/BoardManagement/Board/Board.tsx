@@ -3,16 +3,16 @@ import './Board.css';
 import List from '../../ListManagement/List/List';
 import Modal from '../../UIComponents/Modal/Modal';
 import Button from '../../UIComponents/Button/Button';
-import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 
 interface Card {
-    id: number;
+    id: string;
     title: string;
     description: string;
 }
 
 interface BoardList {
-    id: number;
+    id: string;
     title: string;
     cards: Card[];
 }
@@ -21,33 +21,37 @@ const Board: React.FC = () => {
     const [lists, setLists] = useState<BoardList[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newListTitle, setNewListTitle] = useState('');
+    const [listCounter, setListCounter] = useState(1);
+    const [cardCounter, setCardCounter] = useState(1);
 
     const handleAddList = () => {
         if (newListTitle.trim()) {
             const newList: BoardList = {
-                id: Date.now(),
+                id: `list_${listCounter}`,
                 title: newListTitle,
                 cards: []
             };
             setLists([...lists, newList]);
             setNewListTitle('');
             setIsModalOpen(false);
+            setListCounter(listCounter + 1);
         }
     };
 
-    const handleAddCard = (listId: number, cardTitle: string, cardDescription: string) => {
+    const handleAddCard = (listId: string, cardTitle: string, cardDescription: string) => {
         setLists(lists.map(list => {
             if (list.id === listId) {
                 return {
                     ...list,
-                    cards: [...list.cards, { id: Date.now(), title: cardTitle, description: cardDescription }]
+                    cards: [...list.cards, { id: `card_${cardCounter}`, title: cardTitle, description: cardDescription }]
                 };
             }
             return list;
         }));
+        setCardCounter(cardCounter + 1);
     };
 
-    const handleDeleteCard = (listId: number, cardId: number) => {
+    const handleDeleteCard = (listId: string, cardId: string) => {
         setLists(lists.map(list => {
             if (list.id === listId) {
                 return {
@@ -59,8 +63,32 @@ const Board: React.FC = () => {
         }));
     };
 
+    const handleDeleteList = (listId: string) => {
+        setLists(lists.filter(list => list.id !== listId));
+    };
+
+    const handleMoveListLeft = (listId: string) => {
+        const index = lists.findIndex(list => list.id === listId);
+        if (index > 0) {
+            const newLists = [...lists];
+            const [movedList] = newLists.splice(index, 1);
+            newLists.splice(index - 1, 0, movedList);
+            setLists(newLists);
+        }
+    };
+
+    const handleMoveListRight = (listId: string) => {
+        const index = lists.findIndex(list => list.id === listId);
+        if (index < lists.length - 1) {
+            const newLists = [...lists];
+            const [movedList] = newLists.splice(index, 1);
+            newLists.splice(index + 1, 0, movedList);
+            setLists(newLists);
+        }
+    };
+
     const onDragEnd = (result: DropResult) => {
-        const { source, destination } = result;
+        const { source, destination, type } = result;
 
         if (!destination) {
             return;
@@ -70,19 +98,21 @@ const Board: React.FC = () => {
             return;
         }
 
-        const sourceListIndex = lists.findIndex(list => list.id.toString() === source.droppableId);
-        const destinationListIndex = lists.findIndex(list => list.id.toString() === destination.droppableId);
+        if (type === 'CARD') {
+            const sourceListIndex = lists.findIndex(list => list.id === source.droppableId);
+            const destinationListIndex = lists.findIndex(list => list.id === destination.droppableId);
 
-        const sourceList = lists[sourceListIndex];
-        const [removed] = sourceList.cards.splice(source.index, 1);
-        const destinationList = lists[destinationListIndex];
-        destinationList.cards.splice(destination.index, 0, removed);
+            const sourceList = lists[sourceListIndex];
+            const [movedCard] = sourceList.cards.splice(source.index, 1);
+            const destinationList = lists[destinationListIndex];
+            destinationList.cards.splice(destination.index, 0, movedCard);
 
-        const newLists = [...lists];
-        newLists[sourceListIndex] = sourceList;
-        newLists[destinationListIndex] = destinationList;
+            const newLists = [...lists];
+            newLists[sourceListIndex] = sourceList;
+            newLists[destinationListIndex] = destinationList;
 
-        setLists(newLists);
+            setLists(newLists);
+        }
     };
 
     return (
@@ -90,25 +120,18 @@ const Board: React.FC = () => {
             <Button onClick={() => setIsModalOpen(true)} label="Nuova Lista" className="new-list-button" />
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="lists-container">
-                    {lists.map(list => (
-                        <Droppable key={list.id} droppableId={list.id.toString()}>
-                            {(provided) => (
-                                <div
-                                    ref={provided.innerRef}
-                                    {...provided.droppableProps}
-                                    className="list-container"
-                                >
-                                    <List
-                                        listId={list.id}
-                                        title={list.title}
-                                        cards={list.cards}
-                                        onAddCard={handleAddCard}
-                                        onDeleteCard={handleDeleteCard}
-                                    />
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
+                    {lists.map((list, index) => (
+                        <List
+                            key={list.id}
+                            listId={list.id}
+                            title={list.title}
+                            cards={list.cards}
+                            onAddCard={handleAddCard}
+                            onDeleteCard={handleDeleteCard}
+                            onDeleteList={handleDeleteList}
+                            onMoveListLeft={handleMoveListLeft}
+                            onMoveListRight={handleMoveListRight}
+                        />
                     ))}
                 </div>
             </DragDropContext>

@@ -1,19 +1,33 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import './List.css';
 import Card from '../../CardManagement/Card/Card';
 import Modal from '../../UIComponents/Modal/Modal';
 import Button from '../../UIComponents/Button/Button';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faArrowRight, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 interface ListProps {
     title: string;
-    cards: { id: number; title: string; description: string }[];
-    onAddCard: (listId: number, cardTitle: string, cardDescription: string) => void;
-    onDeleteCard: (listId: number, cardId: number) => void;
-    listId: number;
+    cards: { id: string; title: string; description: string }[];
+    onAddCard: (listId: string, cardTitle: string, cardDescription: string) => void;
+    onDeleteCard: (listId: string, cardId: string) => void;
+    listId: string;
+    onDeleteList: (listId: string) => void;
+    onMoveListLeft: (listId: string) => void;
+    onMoveListRight: (listId: string) => void;
 }
 
-const List: React.FC<ListProps> = ({ title, cards, onAddCard, onDeleteCard, listId }) => {
+const List: React.FC<ListProps> = ({
+    title,
+    cards,
+    onAddCard,
+    onDeleteCard,
+    listId,
+    onDeleteList,
+    onMoveListLeft,
+    onMoveListRight,
+}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newCardTitle, setNewCardTitle] = useState('');
     const [newCardDescription, setNewCardDescription] = useState('');
@@ -27,18 +41,30 @@ const List: React.FC<ListProps> = ({ title, cards, onAddCard, onDeleteCard, list
         }
     };
 
-    const handleDeleteCard = (cardId: number) => {
+    const handleDeleteCard = (cardId: string) => {
         onDeleteCard(listId, cardId);
     };
 
     return (
         <div className="list">
-            <h3>{title}</h3>
-            <Droppable droppableId={listId.toString()} type="CARD">
+            <div className="list-header">
+                <button className="move-list-left" onClick={() => onMoveListLeft(listId)}>
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                </button>
+                <h3>{title}</h3>
+                <button className="move-list-right" onClick={() => onMoveListRight(listId)}>
+                    <FontAwesomeIcon icon={faArrowRight} />
+                </button>
+            </div>
+            <Droppable droppableId={listId} type="CARD">
                 {(provided) => (
-                    <div ref={provided.innerRef} {...provided.droppableProps} className="cards-container">
+                    <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className="cards-container"
+                    >
                         {cards.map((card, index) => (
-                            <Draggable key={card.id} draggableId={card.id.toString()} index={index}>
+                            <Draggable key={card.id} draggableId={card.id} index={index}>
                                 {(provided) => (
                                     <div
                                         ref={provided.innerRef}
@@ -80,6 +106,9 @@ const List: React.FC<ListProps> = ({ title, cards, onAddCard, onDeleteCard, list
                     </div>
                 </div>
             </Modal>
+            <button className="delete-list-button" onClick={() => onDeleteList(listId)}>
+                <FontAwesomeIcon icon={faTrash} />
+            </button>
         </div>
     );
 };

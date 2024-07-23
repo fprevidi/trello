@@ -3,6 +3,7 @@ import './Board.css';
 import List from '../../ListManagement/List/List';
 import Modal from '../../UIComponents/Modal/Modal';
 import Button from '../../UIComponents/Button/Button';
+import Notification from '../../UIComponents/Notification/Notification';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 
 interface Card {
@@ -23,9 +24,10 @@ const Board: React.FC = () => {
     const [newListTitle, setNewListTitle] = useState('');
     const [listCounter, setListCounter] = useState(1);
     const [cardCounter, setCardCounter] = useState(1);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const handleAddList = () => {
-        if (newListTitle.trim()) {
+        if (newListTitle.trim() && !lists.some(list => list.title === newListTitle)) {
             const newList: BoardList = {
                 id: `list_${listCounter}`,
                 title: newListTitle,
@@ -35,6 +37,8 @@ const Board: React.FC = () => {
             setNewListTitle('');
             setIsModalOpen(false);
             setListCounter(listCounter + 1);
+        } else {
+            setErrorMessage("Una lista con lo stesso titolo esiste gia'");
         }
     };
 
@@ -57,6 +61,18 @@ const Board: React.FC = () => {
                 return {
                     ...list,
                     cards: list.cards.filter(card => card.id !== cardId)
+                };
+            }
+            return list;
+        }));
+    };
+
+    const handleSaveCard = (listId: string, cardId: string, title: string, description: string) => {
+        setLists(lists.map(list => {
+            if (list.id === listId) {
+                return {
+                    ...list,
+                    cards: list.cards.map(card => card.id === cardId ? { ...card, title, description } : card)
                 };
             }
             return list;
@@ -88,7 +104,7 @@ const Board: React.FC = () => {
     };
 
     const onDragEnd = (result: DropResult) => {
-        const { source, destination, type } = result;
+        const { source, destination } = result;
 
         if (!destination) {
             return;
@@ -98,29 +114,28 @@ const Board: React.FC = () => {
             return;
         }
 
-        if (type === 'CARD') {
-            const sourceListIndex = lists.findIndex(list => list.id === source.droppableId);
-            const destinationListIndex = lists.findIndex(list => list.id === destination.droppableId);
+        const sourceListIndex = lists.findIndex(list => list.id === source.droppableId);
+        const destinationListIndex = lists.findIndex(list => list.id === destination.droppableId);
 
-            const sourceList = lists[sourceListIndex];
-            const [movedCard] = sourceList.cards.splice(source.index, 1);
-            const destinationList = lists[destinationListIndex];
-            destinationList.cards.splice(destination.index, 0, movedCard);
+        const sourceList = lists[sourceListIndex];
+        const [movedCard] = sourceList.cards.splice(source.index, 1);
+        const destinationList = lists[destinationListIndex];
+        destinationList.cards.splice(destination.index, 0, movedCard);
 
-            const newLists = [...lists];
-            newLists[sourceListIndex] = sourceList;
-            newLists[destinationListIndex] = destinationList;
+        const newLists = [...lists];
+        newLists[sourceListIndex] = sourceList;
+        newLists[destinationListIndex] = destinationList;
 
-            setLists(newLists);
-        }
+        setLists(newLists);
     };
 
     return (
         <div className="board-container">
+            {errorMessage && <Notification message={errorMessage} onClose={() => setErrorMessage(null)} />}
             <Button onClick={() => setIsModalOpen(true)} label="Nuova Lista" className="new-list-button" />
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="lists-container">
-                    {lists.map((list, index) => (
+                    {lists.map((list) => (
                         <List
                             key={list.id}
                             listId={list.id}
@@ -128,6 +143,7 @@ const Board: React.FC = () => {
                             cards={list.cards}
                             onAddCard={handleAddCard}
                             onDeleteCard={handleDeleteCard}
+                            onSaveCard={handleSaveCard}
                             onDeleteList={handleDeleteList}
                             onMoveListLeft={handleMoveListLeft}
                             onMoveListRight={handleMoveListRight}

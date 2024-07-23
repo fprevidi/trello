@@ -1,14 +1,23 @@
 .card {
+    position: relative;
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 4px;
-    padding: 0.5rem;
+    padding: 1rem;
     margin: 0.5rem 0;
-    position: relative;
 }
 
+.delete-card-icon {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    color: red;
+    cursor: pointer;
+}
+
+
 .card-content {
-    padding-right: 2rem; /* Space for delete icon */
+    padding-right: 2rem;
 }
 
 .card h4 {
@@ -19,14 +28,78 @@
     margin: 0;
 }
 
-.delete-icon {
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
+
+    .delete-icon:hover {
+        color: #a71d2a;
+    }
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1001;
+}
+
+.comments-section {
+    margin-top: 1rem;
+}
+
+.comment {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.add-comment {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+}
+
+.comment-textarea {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    resize: none;
+}
+
+.add-comment-button {
+    align-self: flex-end;
+    padding: 0.5rem 1rem;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.modal-button {
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+}
+
+.delete-comment-icon {
     color: #dc3545;
     cursor: pointer;
 }
 
-    .delete-icon:hover {
+    .delete-comment-icon:hover {
         color: #a71d2a;
     }

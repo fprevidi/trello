@@ -17,8 +17,12 @@
 
 .lists-container {
     display: flex;
-    gap: 4px; /* Ridotto il gap tra le liste */
+    gap: 1rem;
     overflow-x: auto;
     padding: 0.5rem;
     width: 100%;
 }
+
+    .lists-container > div {
+        transition: transform 1.9s ease-in-out; /* Aggiungi transizione */
+    }

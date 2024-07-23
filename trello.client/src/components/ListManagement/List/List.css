@@ -13,6 +13,20 @@
         text-align: center;
         flex-grow: 1;
     }
+.card-preview {
+    cursor: pointer;
+    padding: 10px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+}
+
+    .card-preview h4 {
+        margin: 0;
+    }
+
+/* altri stili */
 
 .cards-container {
     margin-bottom: 1rem;

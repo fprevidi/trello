@@ -12,6 +12,7 @@ interface ListProps {
     cards: { id: string; title: string; description: string }[];
     onAddCard: (listId: string, cardTitle: string, cardDescription: string) => void;
     onDeleteCard: (listId: string, cardId: string) => void;
+    onSaveCard: (listId: string, cardId: string, title: string, description: string) => void;
     listId: string;
     onDeleteList: (listId: string) => void;
     onMoveListLeft: (listId: string) => void;
@@ -23,46 +24,53 @@ const List: React.FC<ListProps> = ({
     cards,
     onAddCard,
     onDeleteCard,
+    onSaveCard,
     listId,
     onDeleteList,
     onMoveListLeft,
     onMoveListRight,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [newCardTitle, setNewCardTitle] = useState('');
-    const [newCardDescription, setNewCardDescription] = useState('');
+    const [selectedCard, setSelectedCard] = useState<{ id: string; title: string; description: string } | null>(null);
 
     const handleAddCard = () => {
-        if (newCardTitle.trim() && newCardDescription.trim()) {
-            onAddCard(listId, newCardTitle, newCardDescription);
-            setNewCardTitle('');
-            setNewCardDescription('');
-            setIsModalOpen(false);
-        }
+        setSelectedCard(null); // Null indica che stiamo creando una nuova card
+        setIsModalOpen(true);
     };
 
-    const handleDeleteCard = (cardId: string) => {
-        onDeleteCard(listId, cardId);
+    const handleEditCard = (card: { id: string; title: string; description: string }) => {
+        setSelectedCard(card); // Passa la card selezionata per la modifica
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedCard(null);
+    };
+
+    const handleSaveCard = (id: string, title: string, description: string) => {
+        if (id) {
+            onSaveCard(listId, id, title, description);
+        } else {
+            onAddCard(listId, title, description);
+        }
+        handleCloseModal();
     };
 
     return (
         <div className="list">
             <div className="list-header">
-                <button className="arrow-button move-list-left" onClick={() => onMoveListLeft(listId)}>
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                </button>
-                <h3 className="list-title">{title}</h3>
-                <button className="arrow-button move-list-right" onClick={() => onMoveListRight(listId)}>
-                    <FontAwesomeIcon icon={faArrowRight} />
-                </button>
+       
+                    <FontAwesomeIcon icon={faArrowLeft} onClick={() => onMoveListLeft(listId)} />
+
+                <h3>{title}</h3>
+  
+                    <FontAwesomeIcon icon={faArrowRight} onClick={() => onMoveListRight(listId)} />
+       
             </div>
-            <Droppable droppableId={listId} type="CARD">
+            <Droppable droppableId={listId}>
                 {(provided) => (
-                    <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className="cards-container"
-                    >
+                    <div className="cards" ref={provided.innerRef} {...provided.droppableProps}>
                         {cards.map((card, index) => (
                             <Draggable key={card.id} draggableId={card.id} index={index}>
                                 {(provided) => (
@@ -70,13 +78,12 @@ const List: React.FC<ListProps> = ({
                                         ref={provided.innerRef}
                                         {...provided.draggableProps}
                                         {...provided.dragHandleProps}
-                                        className="card-container"
+                                        onClick={() => handleEditCard(card)}
                                     >
-                                        <Card
-                                            title={card.title}
-                                            description={card.description}
-                                            onDeleteCard={() => handleDeleteCard(card.id)}
-                                        />
+                                        <div className="card-preview">
+                                            <h4>{card.title}</h4>
+                                            {card.description}
+                                        </div>
                                     </div>
                                 )}
                             </Draggable>
@@ -85,37 +92,23 @@ const List: React.FC<ListProps> = ({
                     </div>
                 )}
             </Droppable>
-            <Button onClick={() => setIsModalOpen(true)} label="Aggiungi Card" />
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <h3>Nuova Card</h3>
-                        <input
-                            type="text"
-                            value={newCardTitle}
-                            onChange={(e) => setNewCardTitle(e.target.value)}
-                            placeholder="Titolo nuova card"
-                        />
-                        <textarea
-                            value={newCardDescription}
-                            onChange={(e) => setNewCardDescription(e.target.value)}
-                            placeholder="Descrizione nuova card"
-                        />
-                        <div className="modal-buttons">
-                            <Button onClick={handleAddCard} label="OK" />
-                            <Button onClick={() => setIsModalOpen(false)} label="Annulla" />
-                        </div>
-                    </div>
+            <Button onClick={handleAddCard} label="Aggiungi Card" />
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+                <div className="modal-content">
+                    <Card
+                        id={selectedCard?.id || ''}
+                        title={selectedCard?.title || ''}
+                        description={selectedCard?.description || ''}
+                        onSaveCard={handleSaveCard}
+                        onEditCard={handleCloseModal}
+                        onDeleteCard={() => onDeleteCard(listId, selectedCard?.id || '')}
+                        isEditing={true}
+                    />
                 </div>
             </Modal>
-
-
-            <FontAwesomeIcon
-                icon={faTrash}
-                className="delete-icon"
-                onClick={() => onDeleteList(listId)}
-
-            />
+            <button className="delete-list-button" onClick={() => onDeleteList(listId)}>
+                <FontAwesomeIcon icon={faTrash} />
+            </button>
         </div>
     );
 };

@@ -16,6 +16,7 @@
     <Folder Include="src\components\Navigation\NavBar\" />
     <Folder Include="src\components\Navigation\SideBar\" />
     <Folder Include="src\components\UIComponents\Notification\" />
+    <Folder Include="src\components\UIComponents\ConfirmModal\" />
     <Folder Include="src\components\UtilityComponents\Loader\" />
     <Folder Include="src\components\UtilityComponents\Notification\" />
   </ItemGroup>

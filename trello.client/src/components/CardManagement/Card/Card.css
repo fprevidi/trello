@@ -81,18 +81,27 @@
 
 .add-comment-button {
     align-self: flex-end;
-    padding: 0.5rem 1rem;
+    padding: 0.1rem 0.1rem;
+    background-color: green;
+    color: white;
+    height:2rem;
+    width:4rem;
+    font-size:0.6rem;
 }
 
 .modal-buttons {
     display: flex;
     justify-content: flex-end;
     margin-top: 1rem;
+ 
+
 }
 
 .modal-button {
     padding: 0.5rem 1rem;
     margin-left: 0.5rem;
+    background-color: blue;
+    color: white;
 }
 
 .delete-comment-icon {

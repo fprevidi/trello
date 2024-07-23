@@ -76,20 +76,7 @@
     align-items: center;
 }
 
-.arrow-button {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
-    .arrow-button:hover {
-        background-color: transparent;
-        color: inherit; /* Mantiene il colore dell'icona invariato */
-    }
 
 .move-list-left {
     margin-right: auto;

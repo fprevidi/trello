@@ -3,6 +3,7 @@ import './List.css';
 import Card from '../../CardManagement/Card/Card';
 import Modal from '../../UIComponents/Modal/Modal';
 import Button from '../../UIComponents/Button/Button';
+import ConfirmModal from '../../UIComponents/ConfirmModal/ConfirmModal';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -32,6 +33,8 @@ const List: React.FC<ListProps> = ({
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedCard, setSelectedCard] = useState<{ uid: string; title: string; description: string } | null>(null);
+    const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [cardToDelete, setCardToDelete] = useState<string | null>(null);
 
     const handleAddCard = () => {
         setSelectedCard(null); // Null indica che stiamo creando una nuova card
@@ -57,6 +60,19 @@ const List: React.FC<ListProps> = ({
         handleCloseModal();
     };
 
+    const openConfirmModal = (cardUid: string) => {
+        setCardToDelete(cardUid);
+        setConfirmModalOpen(true);
+    };
+
+    const handleDeleteCardConfirm = () => {
+        if (cardToDelete) {
+            onDeleteCard(listUid, cardToDelete);
+            setCardToDelete(null);
+        }
+        setConfirmModalOpen(false);
+    };
+
     return (
         <div className="list">
             <div className="list-header">
@@ -68,7 +84,7 @@ const List: React.FC<ListProps> = ({
                 {(provided) => (
                     <div className="cards" ref={provided.innerRef} {...provided.droppableProps}>
                         {cards.length === 0 ? (
-                            <div className="empty-list-placeholder">Trascina qui una card</div>
+                            <div className="empty-list-placeholder mt-4 mb-4">Trascina qui una card</div>
                         ) : (
                             cards.map((card, index) => (
                                 <Draggable key={card.uid} draggableId={card.uid} index={index}>
@@ -83,7 +99,7 @@ const List: React.FC<ListProps> = ({
                                                 title={card.title}
                                                 description={card.description}
                                                 onSaveCard={(uid, title, description) => handleSaveCard(uid, title, description)}
-                                                onDeleteCard={() => onDeleteCard(listUid, card.uid)}
+                                                onDeleteCard={() => openConfirmModal(card.uid)}
                                                 onEditCard={() => handleEditCard(card)}
                                                 isEditing={selectedCard?.uid === card.uid}
                                             />
@@ -96,7 +112,7 @@ const List: React.FC<ListProps> = ({
                     </div>
                 )}
             </Droppable>
-            <Button onClick={handleAddCard} label="Aggiungi Card" />
+            <Button onClick={handleAddCard} label="Aggiungi Card" variant="custom" className="bg-blue-500 text-white w-48 mt-4" />
             <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
                 <div className="modal-content">
                     <Card
@@ -113,6 +129,12 @@ const List: React.FC<ListProps> = ({
             <button className="delete-list-button" onClick={() => onDeleteList(listUid)}>
                 <FontAwesomeIcon icon={faTrash} />
             </button>
+            <ConfirmModal
+                isOpen={confirmModalOpen}
+                onClose={() => setConfirmModalOpen(false)}
+                onConfirm={handleDeleteCardConfirm}
+                message="Sei sicuro di voler eliminare questa card?"
+            />
         </div>
     );
 };

@@ -3,6 +3,7 @@ import './Board.css';
 import List from '../../ListManagement/List/List';
 import Modal from '../../UIComponents/Modal/Modal';
 import Button from '../../UIComponents/Button/Button';
+import ConfirmModal from '../../UIComponents/ConfirmModal/ConfirmModal';
 import Notification from '../../UIComponents/Notification/Notification';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,6 +24,8 @@ const Board: React.FC = () => {
     const [lists, setLists] = useState<BoardList[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newListTitle, setNewListTitle] = useState('');
+    const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [listToDelete, setListToDelete] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const handleAddList = () => {
@@ -76,8 +79,12 @@ const Board: React.FC = () => {
         }));
     };
 
-    const handleDeleteList = (listUid: string) => {
-        setLists(lists.filter(list => list.uid !== listUid));
+    const handleDeleteList = () => {
+        if (listToDelete) {
+            setLists(lists.filter(list => list.uid !== listToDelete));
+            setListToDelete(null);
+        }
+        setConfirmModalOpen(false);
     };
 
     const handleMoveListLeft = (listUid: string) => {
@@ -126,10 +133,15 @@ const Board: React.FC = () => {
         setLists(newLists);
     };
 
+    const openConfirmModal = (listUid: string) => {
+        setListToDelete(listUid);
+        setConfirmModalOpen(true);
+    };
+
     return (
         <div className="board-container">
             {errorMessage && <Notification message={errorMessage} onClose={() => setErrorMessage(null)} />}
-            <Button onClick={() => setIsModalOpen(true)} label="Nuova Lista" className="new-list-button" />
+            <Button onClick={() => setIsModalOpen(true)} label="Nuova Lista" variant="custom" className="new-list-button" />
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="lists-container">
                     {lists.map((list) => (
@@ -141,7 +153,7 @@ const Board: React.FC = () => {
                             onAddCard={handleAddCard}
                             onDeleteCard={handleDeleteCard}
                             onSaveCard={handleSaveCard}
-                            onDeleteList={handleDeleteList}
+                            onDeleteList={openConfirmModal}
                             onMoveListLeft={handleMoveListLeft}
                             onMoveListRight={handleMoveListRight}
                         />
@@ -159,11 +171,17 @@ const Board: React.FC = () => {
                         className="modal-input"
                     />
                     <div className="modal-buttons">
-                        <Button onClick={handleAddList} label="OK" className="mr-4" />
-                        <Button onClick={() => setIsModalOpen(false)} label="Annulla" />
+                        <Button onClick={handleAddList} label="OK" className="mr-4 bg-red-500 text-white w-48" variant="custom" />
+                        <Button onClick={() => setIsModalOpen(false)} label="ANNULLA" className="mr-4 bg-gray-500 text-white w-48" variant="custom" />
                     </div>
                 </div>
             </Modal>
+            <ConfirmModal
+                isOpen={confirmModalOpen}
+                onClose={() => setConfirmModalOpen(false)}
+                onConfirm={handleDeleteList}
+                message="Sei sicuro di voler eliminare questa lista?"
+            />
         </div>
     );
 };

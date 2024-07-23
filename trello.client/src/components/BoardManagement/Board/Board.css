@@ -13,7 +13,19 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: blue;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    width: 200px;
 }
+
+    .new_list_button:hover {
+        background-color: #218838;
+    }
 
 .lists-container {
     display: flex;

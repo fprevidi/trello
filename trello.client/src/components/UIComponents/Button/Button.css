@@ -6,7 +6,7 @@
     border-radius: 4px;
     cursor: pointer;
     display: inline-block;
-    width:200px
+    width: 200px;
 }
 
     .custom-button:hover {
@@ -21,7 +21,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width:40px;
+    width: 40px;
 }
 
     .arrow-button:hover {

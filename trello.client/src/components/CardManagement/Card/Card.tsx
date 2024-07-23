@@ -10,17 +10,17 @@ interface Comment {
 }
 
 interface CardProps {
-    id: string;
+    uid: string;
     title: string;
     description: string;
     onDeleteCard: () => void;
-    onSaveCard: (id: string, title: string, description: string) => void;
+    onSaveCard: (uid: string, title: string, description: string) => void;
     onEditCard: () => void;
     isEditing: boolean;
 }
 
 const Card: React.FC<CardProps> = ({
-    id,
+    uid,
     title: initialTitle,
     description: initialDescription,
     onDeleteCard,
@@ -66,7 +66,7 @@ const Card: React.FC<CardProps> = ({
     };
 
     const handleSaveCard = () => {
-        onSaveCard(id, editTitle, editDescription);
+        onSaveCard(uid, editTitle, editDescription);
         onEditCard();
     };
 
@@ -108,9 +108,11 @@ const Card: React.FC<CardProps> = ({
                     </div>
                 </div>
             ) : (
-                <div onClick={onEditCard}>
-                    <h4>{initialTitle}</h4>
-                    <p>{initialDescription}</p>
+                <div>
+                    <div className="card-content" onClick={onEditCard}>
+                        <h4>{initialTitle}</h4>
+                        <p>{initialDescription}</p>
+                    </div>
                     <FontAwesomeIcon
                         icon={faTrash}
                         className="delete-card-icon"

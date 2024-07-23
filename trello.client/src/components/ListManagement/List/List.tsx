@@ -9,14 +9,14 @@ import { faArrowLeft, faArrowRight, faTrash } from '@fortawesome/free-solid-svg-
 
 interface ListProps {
     title: string;
-    cards: { id: string; title: string; description: string }[];
-    onAddCard: (listId: string, cardTitle: string, cardDescription: string) => void;
-    onDeleteCard: (listId: string, cardId: string) => void;
-    onSaveCard: (listId: string, cardId: string, title: string, description: string) => void;
-    listId: string;
-    onDeleteList: (listId: string) => void;
-    onMoveListLeft: (listId: string) => void;
-    onMoveListRight: (listId: string) => void;
+    cards: { uid: string; title: string; description: string }[];
+    onAddCard: (listUid: string, cardTitle: string, cardDescription: string) => void;
+    onDeleteCard: (listUid: string, cardUid: string) => void;
+    onSaveCard: (listUid: string, cardUid: string, title: string, description: string) => void;
+    listUid: string;
+    onDeleteList: (listUid: string) => void;
+    onMoveListLeft: (listUid: string) => void;
+    onMoveListRight: (listUid: string) => void;
 }
 
 const List: React.FC<ListProps> = ({
@@ -25,20 +25,20 @@ const List: React.FC<ListProps> = ({
     onAddCard,
     onDeleteCard,
     onSaveCard,
-    listId,
+    listUid,
     onDeleteList,
     onMoveListLeft,
     onMoveListRight,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedCard, setSelectedCard] = useState<{ id: string; title: string; description: string } | null>(null);
+    const [selectedCard, setSelectedCard] = useState<{ uid: string; title: string; description: string } | null>(null);
 
     const handleAddCard = () => {
         setSelectedCard(null); // Null indica che stiamo creando una nuova card
         setIsModalOpen(true);
     };
 
-    const handleEditCard = (card: { id: string; title: string; description: string }) => {
+    const handleEditCard = (card: { uid: string; title: string; description: string }) => {
         setSelectedCard(card); // Passa la card selezionata per la modifica
         setIsModalOpen(true);
     };
@@ -48,11 +48,11 @@ const List: React.FC<ListProps> = ({
         setSelectedCard(null);
     };
 
-    const handleSaveCard = (id: string, title: string, description: string) => {
-        if (id) {
-            onSaveCard(listId, id, title, description);
+    const handleSaveCard = (uid: string, title: string, description: string) => {
+        if (uid) {
+            onSaveCard(listUid, uid, title, description);
         } else {
-            onAddCard(listId, title, description);
+            onAddCard(listUid, title, description);
         }
         handleCloseModal();
     };
@@ -60,34 +60,38 @@ const List: React.FC<ListProps> = ({
     return (
         <div className="list">
             <div className="list-header">
-       
-                    <FontAwesomeIcon icon={faArrowLeft} onClick={() => onMoveListLeft(listId)} />
-
+                <FontAwesomeIcon icon={faArrowLeft} onClick={() => onMoveListLeft(listUid)} />
                 <h3>{title}</h3>
-  
-                    <FontAwesomeIcon icon={faArrowRight} onClick={() => onMoveListRight(listId)} />
-       
+                <FontAwesomeIcon icon={faArrowRight} onClick={() => onMoveListRight(listUid)} />
             </div>
-            <Droppable droppableId={listId}>
+            <Droppable droppableId={listUid}>
                 {(provided) => (
                     <div className="cards" ref={provided.innerRef} {...provided.droppableProps}>
-                        {cards.map((card, index) => (
-                            <Draggable key={card.id} draggableId={card.id} index={index}>
-                                {(provided) => (
-                                    <div
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        onClick={() => handleEditCard(card)}
-                                    >
-                                        <div className="card-preview">
-                                            <h4>{card.title}</h4>
-                                            {card.description}
+                        {cards.length === 0 ? (
+                            <div className="empty-list-placeholder">Trascina qui una card</div>
+                        ) : (
+                            cards.map((card, index) => (
+                                <Draggable key={card.uid} draggableId={card.uid} index={index}>
+                                    {(provided) => (
+                                        <div
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                        >
+                                            <Card
+                                                uid={card.uid}
+                                                title={card.title}
+                                                description={card.description}
+                                                onSaveCard={(uid, title, description) => handleSaveCard(uid, title, description)}
+                                                onDeleteCard={() => onDeleteCard(listUid, card.uid)}
+                                                onEditCard={() => handleEditCard(card)}
+                                                isEditing={selectedCard?.uid === card.uid}
+                                            />
                                         </div>
-                                    </div>
-                                )}
-                            </Draggable>
-                        ))}
+                                    )}
+                                </Draggable>
+                            ))
+                        )}
                         {provided.placeholder}
                     </div>
                 )}
@@ -96,17 +100,17 @@ const List: React.FC<ListProps> = ({
             <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
                 <div className="modal-content">
                     <Card
-                        id={selectedCard?.id || ''}
+                        uid={selectedCard?.uid || ''}
                         title={selectedCard?.title || ''}
                         description={selectedCard?.description || ''}
                         onSaveCard={handleSaveCard}
                         onEditCard={handleCloseModal}
-                        onDeleteCard={() => onDeleteCard(listId, selectedCard?.id || '')}
+                        onDeleteCard={() => onDeleteCard(listUid, selectedCard?.uid || '')}
                         isEditing={true}
                     />
                 </div>
             </Modal>
-            <button className="delete-list-button" onClick={() => onDeleteList(listId)}>
+            <button className="delete-list-button" onClick={() => onDeleteList(listUid)}>
                 <FontAwesomeIcon icon={faTrash} />
             </button>
         </div>

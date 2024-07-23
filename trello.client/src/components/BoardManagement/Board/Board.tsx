@@ -5,15 +5,16 @@ import Modal from '../../UIComponents/Modal/Modal';
 import Button from '../../UIComponents/Button/Button';
 import Notification from '../../UIComponents/Notification/Notification';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Card {
-    id: string;
+    uid: string;
     title: string;
     description: string;
 }
 
 interface BoardList {
-    id: string;
+    uid: string;
     title: string;
     cards: Card[];
 }
@@ -22,69 +23,65 @@ const Board: React.FC = () => {
     const [lists, setLists] = useState<BoardList[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newListTitle, setNewListTitle] = useState('');
-    const [listCounter, setListCounter] = useState(1);
-    const [cardCounter, setCardCounter] = useState(1);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const handleAddList = () => {
         if (newListTitle.trim() && !lists.some(list => list.title === newListTitle)) {
             const newList: BoardList = {
-                id: `list_${listCounter}`,
+                uid: uuidv4(),
                 title: newListTitle,
                 cards: []
             };
             setLists([...lists, newList]);
             setNewListTitle('');
             setIsModalOpen(false);
-            setListCounter(listCounter + 1);
         } else {
-            setErrorMessage("Una lista con lo stesso titolo esiste gia'");
+            setErrorMessage("Una lista con lo stesso titolo esiste già.");
         }
     };
 
-    const handleAddCard = (listId: string, cardTitle: string, cardDescription: string) => {
+    const handleAddCard = (listUid: string, cardTitle: string, cardDescription: string) => {
         setLists(lists.map(list => {
-            if (list.id === listId) {
+            if (list.uid === listUid) {
                 return {
                     ...list,
-                    cards: [...list.cards, { id: `card_${cardCounter}`, title: cardTitle, description: cardDescription }]
-                };
-            }
-            return list;
-        }));
-        setCardCounter(cardCounter + 1);
-    };
-
-    const handleDeleteCard = (listId: string, cardId: string) => {
-        setLists(lists.map(list => {
-            if (list.id === listId) {
-                return {
-                    ...list,
-                    cards: list.cards.filter(card => card.id !== cardId)
+                    cards: [...list.cards, { uid: uuidv4(), title: cardTitle, description: cardDescription }]
                 };
             }
             return list;
         }));
     };
 
-    const handleSaveCard = (listId: string, cardId: string, title: string, description: string) => {
+    const handleDeleteCard = (listUid: string, cardUid: string) => {
         setLists(lists.map(list => {
-            if (list.id === listId) {
+            if (list.uid === listUid) {
                 return {
                     ...list,
-                    cards: list.cards.map(card => card.id === cardId ? { ...card, title, description } : card)
+                    cards: list.cards.filter(card => card.uid !== cardUid)
                 };
             }
             return list;
         }));
     };
 
-    const handleDeleteList = (listId: string) => {
-        setLists(lists.filter(list => list.id !== listId));
+    const handleSaveCard = (listUid: string, cardUid: string, title: string, description: string) => {
+        setLists(lists.map(list => {
+            if (list.uid === listUid) {
+                return {
+                    ...list,
+                    cards: list.cards.map(card => card.uid === cardUid ? { ...card, title, description } : card)
+                };
+            }
+            return list;
+        }));
     };
 
-    const handleMoveListLeft = (listId: string) => {
-        const index = lists.findIndex(list => list.id === listId);
+    const handleDeleteList = (listUid: string) => {
+        setLists(lists.filter(list => list.uid !== listUid));
+    };
+
+    const handleMoveListLeft = (listUid: string) => {
+        const index = lists.findIndex(list => list.uid === listUid);
         if (index > 0) {
             const newLists = [...lists];
             const [movedList] = newLists.splice(index, 1);
@@ -93,8 +90,8 @@ const Board: React.FC = () => {
         }
     };
 
-    const handleMoveListRight = (listId: string) => {
-        const index = lists.findIndex(list => list.id === listId);
+    const handleMoveListRight = (listUid: string) => {
+        const index = lists.findIndex(list => list.uid === listUid);
         if (index < lists.length - 1) {
             const newLists = [...lists];
             const [movedList] = newLists.splice(index, 1);
@@ -114,8 +111,8 @@ const Board: React.FC = () => {
             return;
         }
 
-        const sourceListIndex = lists.findIndex(list => list.id === source.droppableId);
-        const destinationListIndex = lists.findIndex(list => list.id === destination.droppableId);
+        const sourceListIndex = lists.findIndex(list => list.uid === source.droppableId);
+        const destinationListIndex = lists.findIndex(list => list.uid === destination.droppableId);
 
         const sourceList = lists[sourceListIndex];
         const [movedCard] = sourceList.cards.splice(source.index, 1);
@@ -137,8 +134,8 @@ const Board: React.FC = () => {
                 <div className="lists-container">
                     {lists.map((list) => (
                         <List
-                            key={list.id}
-                            listId={list.id}
+                            key={list.uid}
+                            listUid={list.uid}
                             title={list.title}
                             cards={list.cards}
                             onAddCard={handleAddCard}

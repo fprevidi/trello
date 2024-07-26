@@ -41,7 +41,9 @@ namespace Trello.Server.api
             if (utente != null)
             {
                 var token = GenerateJwtToken(utente); // Genera un token JWT per l'utente
-                return Ok(token);
+                loginRequest.token = token;
+                loginRequest.uid = utente.Uid.ToString();
+                return Ok(loginRequest);
             }
             else
             {
@@ -116,7 +118,37 @@ namespace Trello.Server.api
             }
 
         }
-       
+ 
+        [HttpGet("/api/LoginEdit/{Uid:Guid}")]
+        public ActionResult<string> LoginEdit(Guid Uid)
+        {
+
+            var utente = _context.Users.FirstOrDefault(a => a.Uid == Uid);
+            //return 
+            return Ok(utente);
+  
+        }
+        
+        [HttpPost("/api/LoginEdit")]
+        public ActionResult<string> LoginEdit([FromBody] LoginRequest loginRequest)
+        {
+
+            var utente = _context.Users.FirstOrDefault(a => a.Uid.ToString() == loginRequest.uid);
+            if (utente == null)
+            {
+                return BadRequest("Utente non trovato");
+            }
+  
+            utente.Password = loginRequest.password;
+            utente.Name = loginRequest.name;
+            _context.Update(utente);
+            _context.SaveChanges();
+
+            //return 
+            return Ok("OK");
+  
+        }
+
         // Metodo ipotetico per generare un token JWT, da implementare
         [NonAction]
         public string GenerateJwtToken(Users utente)
@@ -142,12 +174,15 @@ namespace Trello.Server.api
         }
 
     }
-
+ 
     public class LoginRequest
     {
+        public string? name { get; set; }
         public string? username { get; set; }
         public string? password { get; set; }
         public string? token { get; set; }
+
+        public string? uid { get; set; }
     }
 
 

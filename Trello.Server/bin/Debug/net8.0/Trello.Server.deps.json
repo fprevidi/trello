@@ -9,7 +9,7 @@
       "Trello.Server/1.0.0": {
         "dependencies": {
           "Microsoft.AspNetCore.Authentication.JwtBearer": "8.0.6",
-          "Microsoft.AspNetCore.SpaProxy": "8.0.6",
+          "Microsoft.AspNetCore.SpaProxy": "8.0.7",
           "Microsoft.EntityFrameworkCore": "8.0.6",
           "Microsoft.EntityFrameworkCore.SqlServer": "8.0.6",
           "Microsoft.EntityFrameworkCore.Tools": "8.0.6",
@@ -74,11 +74,11 @@
           }
         }
       },
-      "Microsoft.AspNetCore.SpaProxy/8.0.6": {
+      "Microsoft.AspNetCore.SpaProxy/8.0.7": {
         "runtime": {
           "lib/net8.0/Microsoft.AspNetCore.SpaProxy.dll": {
-            "assemblyVersion": "8.0.6.0",
-            "fileVersion": "8.0.624.26909"
+            "assemblyVersion": "8.0.7.0",
+            "fileVersion": "8.0.724.31402"
           }
         }
       },
@@ -934,12 +934,12 @@
       "path": "microsoft.aspnetcore.authentication.jwtbearer/8.0.6",
       "hashPath": "microsoft.aspnetcore.authentication.jwtbearer.8.0.6.nupkg.sha512"
     },
-    "Microsoft.AspNetCore.SpaProxy/8.0.6": {
+    "Microsoft.AspNetCore.SpaProxy/8.0.7": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-LBIMKEYxs06TJi/7ekqbfJ8VuoBqC3EORy+mw7Xp0gDIdDGhuaKkeT8BWIzetBbGVix4Tpn3k9GEdJ8Z7E7YOw==",
-      "path": "microsoft.aspnetcore.spaproxy/8.0.6",
-      "hashPath": "microsoft.aspnetcore.spaproxy.8.0.6.nupkg.sha512"
+      "sha512": "sha512-31Tcbla9XXgcKaso1VYPy5LBMzYSbY0i8taXYEyO6bknvak4DqKhWJ/FxDp7A9k21rT6QHyKT2P0Kl5FaeHDzA==",
+      "path": "microsoft.aspnetcore.spaproxy/8.0.7",
+      "hashPath": "microsoft.aspnetcore.spaproxy.8.0.7.nupkg.sha512"
     },
     "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
       "type": "package",

@@ -1,6 +1,7 @@
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\spa.proxy.json
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\appsettings.json
+C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Trello.Server.staticwebassets.runtime.json
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Trello.Server.exe
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Trello.Server.deps.json
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Trello.Server.runtimeconfig.json
@@ -9,6 +10,7 @@ C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Tre
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Azure.Core.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Azure.Identity.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Humanizer.dll
+C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Microsoft.AspNetCore.SpaProxy.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
@@ -30,9 +32,13 @@ C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Mic
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Microsoft.OpenApi.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Microsoft.Win32.SystemEvents.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Mono.TextTemplating.dll
+C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\System.CodeDom.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\System.Composition.AttributedModel.dll
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\System.Composition.Convention.dll
@@ -117,7 +123,9 @@ C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\Tre
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\Trello.Server.AssemblyInfoInputs.cache
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\Trello.Server.AssemblyInfo.cs
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\Trello.Server.csproj.CoreCompileInputs.cache
+C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\Trello.Server.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\Trello.Server.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\Trello.Server.sourcelink.json
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\staticwebassets\msbuild.Trello.Server.Microsoft.AspNetCore.StaticWebAssets.props
@@ -132,10 +140,3 @@ C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\ref
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\Trello.Server.pdb
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\Trello.Server.genruntimeconfig.cache
 C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\ref\Trello.Server.dll
-C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
-C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Microsoft.OpenApi.dll
-C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
-C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
-C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
-C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\obj\Debug\net8.0\Trello.Server.MvcApplicationPartsAssemblyInfo.cs
-C:\Users\fprev\Documents\Clienti\Craon\Trello\Trello.Server\bin\Debug\net8.0\Trello.Server.staticwebassets.runtime.json

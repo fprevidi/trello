@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import './Board.css';
 import List from '../../ListManagement/List/List';
 import Modal from '../../UIComponents/Modal/Modal';
@@ -21,12 +22,50 @@ interface BoardList {
 }
 
 const Board: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
     const [lists, setLists] = useState<BoardList[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newListTitle, setNewListTitle] = useState('');
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     const [listToDelete, setListToDelete] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+        // Carica i dati della bacheca specifica utilizzando l'id
+        // Questo può essere sostituito con una chiamata API per ottenere i dati della bacheca
+        const fetchBoardData = (boardId: string) => {
+            // Simula il caricamento dei dati della bacheca
+            const fakeData: BoardList[] = [
+                {
+                    uid: uuidv4(),
+                    title: 'To Do',
+                    cards: [
+                        { uid: uuidv4(), title: 'Task 1', description: 'Description 1' },
+                        { uid: uuidv4(), title: 'Task 2', description: 'Description 2' },
+                    ]
+                },
+                {
+                    uid: uuidv4(),
+                    title: 'In Progress',
+                    cards: [
+                        { uid: uuidv4(), title: 'Task 3', description: 'Description 3' },
+                    ]
+                },
+                {
+                    uid: uuidv4(),
+                    title: 'Done',
+                    cards: [
+                        { uid: uuidv4(), title: 'Task 4', description: 'Description 4' },
+                    ]
+                }
+            ];
+
+            // Imposta i dati fittizi come stato
+            setLists(fakeData);
+        };
+
+        fetchBoardData(id!);
+    }, [id]);
 
     const handleAddList = () => {
         if (newListTitle.trim() && !lists.some(list => list.title === newListTitle)) {

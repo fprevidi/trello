@@ -1,21 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/Authentication/Login/Login';
-import Register from './components/Authentication/Register/Register';
+import Profile from './components/Authentication/Profile/Profile';
 import Board from './components/BoardManagement/Board/Board';
 import NavBar from './components/Navigation/NavBar/NavBar';
 import SideBar from './components/Navigation/SideBar/SideBar';
 import './App.css';
 
 const App: React.FC = () => {
-    const handleLogin = (username: string, password: string) => {
-        console.log('Login', { username, password });
-    };
-
-    const handleRegister = (username: string, password: string, email: string) => {
-        console.log('Register', { username, password, email });
-    };
-
     return (
         <Router>
             <div className="app">
@@ -24,10 +16,11 @@ const App: React.FC = () => {
                     <SideBar />
                     <div className="app-content">
                         <Routes>
-                            <Route path="/" element={<Login onLogin={handleLogin} />} />
-                            <Route path="/login" element={<Login onLogin={handleLogin} />} />
-                            <Route path="/register" element={<Register onRegister={handleRegister} />} />
+                            <Route path="/" element={<Login />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/profile" element={<Profile />} />
                             <Route path="/board" element={<Board />} />
+                            <Route path="/board/:id" element={<Board />} />
                         </Routes>
                     </div>
                 </div>

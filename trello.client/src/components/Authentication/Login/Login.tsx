@@ -3,11 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import Button from '../../UIComponents/Button/Button';
 
-interface LoginProps {
-    onLogin: (username: string, password: string) => void;
-}
-
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
@@ -15,28 +11,27 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        try {
-            await loginApiCall(username, password);
-            onLogin(username, password);
-            navigate('/board'); // Naviga verso la bacheca dopo l'autenticazione
-        } catch (error) {
-            console.error("Errore durante l'autenticazione", error);
-            onLogin(username, password);
-            navigate('/board'); // Naviga verso la bacheca anche in caso di errore
-        }
-    };
-
-    const handleButtonClick = () => {
-        const fakeEvent = new Event('submit', { bubbles: true, cancelable: true });
-        document.querySelector('form')?.dispatchEvent(fakeEvent);
-    };
-
-    const loginApiCall = (username: string, password: string): Promise<void> => {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve();
-            }, 1000); // Simula un ritardo di 1 secondo per la chiamata API
+        const response = await fetch('/api/Login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username,
+                password,
+            }),
         });
+
+        // Simulazione di una risposta positiva
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('token', data.token); // Salva il token
+            localStorage.setItem('uid', data.uid); // Salva l'UID
+            localStorage.setItem('username', data.username); // Salva lo username
+            navigate('/board');
+        } else {
+            console.error('Errore durante il login');
+        }
     };
 
     return (
@@ -62,7 +57,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         required
                     />
                 </div>
-                <Button onClick={handleButtonClick} label="Login" />
+                <Button type="submit" label="Login" variant="custom" />
             </form>
         </div>
     );

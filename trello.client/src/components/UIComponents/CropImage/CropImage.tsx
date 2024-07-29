@@ -33,7 +33,7 @@ const CropImage: React.FC<CropImageProps> = ({ src, onCropComplete }) => {
                 onZoomChange={setZoom}
                 onCropComplete={onCropCompleteCallback}
             />
-            <button onClick={handleCropComplete}>Applica Ritaglio</button>
+            <button type="button" onClick={handleCropComplete}>Applica Ritaglio</button>
         </div>
     );
 };

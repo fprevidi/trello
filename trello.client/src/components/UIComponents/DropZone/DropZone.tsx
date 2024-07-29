@@ -3,9 +3,10 @@ import './DropZone.css';
 
 interface DropZoneProps {
     onDrop: (acceptedFiles: File[]) => void;
+    children?: React.ReactNode;
 }
 
-const DropZone: React.FC<DropZoneProps> = ({ onDrop }) => {
+const DropZone: React.FC<DropZoneProps> = ({ onDrop,children }) => {
     const { getRootProps, getInputProps } = useDropzone({
         onDrop,
         accept: {
@@ -17,7 +18,7 @@ const DropZone: React.FC<DropZoneProps> = ({ onDrop }) => {
     return (
         <div {...getRootProps({ className: 'dropzone' })}>
             <input {...getInputProps()} />
-            <p>Trascina una foto qui, o clicca per selezionarla</p>
+            {children ? children : <p>Trascina una foto qui, o clicca per selezionarla</p>}
         </div>
     );
 };

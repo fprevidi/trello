@@ -10,7 +10,9 @@ const Profile: React.FC = () => {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [profilePic, setProfilePic] = useState<string | null>(null);
-    const [croppedImage, setCroppedImage] = useState<Blob | null>(null);
+    const [croppedImage, setCroppedImage] = useState<File | null>(null);
+    const [croppedImageUrl, setCroppedImageUrl] = useState<string | null>(null);
+    const [showCrop, setShowCrop] = useState(false);
     const uid = localStorage.getItem('uid');
 
     useEffect(() => {
@@ -33,6 +35,7 @@ const Profile: React.FC = () => {
                 setUsername(data.username);
                 setName(data.name);
                 setProfilePic(`/img/profiles/${uid}.jpg`);
+                setCroppedImageUrl(`/img/profiles/$Profile_{uid}.jpg`);
             } else {
                 console.error('Errore durante il recupero del profilo');
             }
@@ -48,7 +51,8 @@ const Profile: React.FC = () => {
         formData.append('username', username);
         formData.append('name', name);
         formData.append('password', password);
-        formData.append('uid', uid!);
+        formData.append('token', localStorage.getItem('token') ?? '');
+        formData.append('uid', uid ?? '');
 
         if (croppedImage) {
             formData.append('profilePic', croppedImage, 'profile.jpg');
@@ -71,15 +75,16 @@ const Profile: React.FC = () => {
 
     const handleDrop = useCallback((acceptedFiles: File[]) => {
         const file = acceptedFiles[0];
-        const reader = new FileReader();
-        reader.onload = () => {
-            setProfilePic(reader.result as string);
-        };
-        reader.readAsDataURL(file);
+        setProfilePic(URL.createObjectURL(file));
+        setShowCrop(true);
     }, []);
 
-    const handleCropComplete = (croppedImage: Blob) => {
-        setCroppedImage(croppedImage);
+    const handleCropComplete = (croppedBlob: Blob) => {
+        const croppedUrl = URL.createObjectURL(croppedBlob);
+        setCroppedImageUrl(croppedUrl);
+        const croppedFile = new File([croppedBlob], 'profile.jpg', { type: 'image/jpeg' });
+        setCroppedImage(croppedFile);
+        setShowCrop(false);
     };
 
     return (
@@ -119,9 +124,16 @@ const Profile: React.FC = () => {
                 </div>
                 <div className="form-group">
                     <label>Foto Profilo:</label>
-                    <DropZone onDrop={handleDrop} />
-                    {profilePic && (
-                        <CropImage src={profilePic} onCropComplete={handleCropComplete} />
+                    {showCrop ? (
+                        <CropImage src={profilePic!} onCropComplete={handleCropComplete} />
+                    ) : (
+                        <DropZone onDrop={handleDrop}>
+                            {croppedImageUrl ? (
+                                <img src={croppedImageUrl} alt="Profile" className="profile-pic" />
+                            ) : (
+                                <div>Trascina una foto...</div>
+                            )}
+                        </DropZone>
                     )}
                 </div>
                 <Button type="submit" label="Salva" className="save-button" variant="custom" /><br />

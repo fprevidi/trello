@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
             {username && uid && (
                 <div className="user-info" onClick={toggleMenu}>
                     <img
-                        src={`/img/profiles/${uid}.jpg`}
+                        src={`/Allegati/FotoProfilo/Profilo_${uid}.jpg`}
                         alt="User profile"
                         className="profile-pic"
                         onError={handleImageError}

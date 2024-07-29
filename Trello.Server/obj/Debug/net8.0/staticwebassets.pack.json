@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\fprev\\Documents\\Clienti\\Craon\\Trello\\Trello.Server\\wwwroot\\img\\Allegati\\FotoProfilo\\Profilo_a989ed12-26c4-4c52-ba3b-12b238fb0660.jpg",
+      "PackagePath": "staticwebassets\\img\\Allegati\\FotoProfilo\\Profilo_a989ed12-26c4-4c52-ba3b-12b238fb0660.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.Trello.Server.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.Trello.Server.props",
+      "PackagePath": "build\\Trello.Server.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.Trello.Server.props",
+      "PackagePath": "buildMultiTargeting\\Trello.Server.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.Trello.Server.props",
+      "PackagePath": "buildTransitive\\Trello.Server.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

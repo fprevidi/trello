@@ -96,7 +96,7 @@ namespace Trello.Server.api
             }
 
         }
-        [HttpPost("ResetPassword")]
+        [HttpPost("api/ResetPassword")]
         public ActionResult<string> ResetPassword([FromBody] LoginRequest loginRequest)
         {
             try
@@ -128,25 +128,60 @@ namespace Trello.Server.api
             return Ok(utente);
   
         }
-        
         [HttpPost("/api/LoginEdit")]
-        public ActionResult<string> LoginEdit([FromBody] LoginRequest loginRequest)
+        public async Task<IActionResult> LoginEdit([FromForm] LoginRequest request)
         {
+            if (request == null)
+            {
+                return BadRequest("Invalid request");
+            }
 
-            var utente = _context.Users.FirstOrDefault(a => a.Uid.ToString() == loginRequest.uid);
+
+
+            // Cerca l'utente da modificare
+            var utente = _context.Users.FirstOrDefault(a => a.Uid == Guid.Parse(request.uid));
             if (utente == null)
             {
-                return BadRequest("Utente non trovato");
+                return NotFound("Utente non trovato");
             }
-  
-            utente.Password = loginRequest.password;
-            utente.Name = loginRequest.name;
+            utente.Name = request.name;
+            utente.Username = request.username;
             _context.Update(utente);
-            _context.SaveChanges();
+           
+            // Path della cartella dove salvare le foto
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot","Allegati", "FotoProfilo");
 
-            //return 
-            return Ok("OK");
-  
+            // Crea la cartella se non esiste
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            // Nome del file
+            string fileName = $"Profilo_{request.uid}.jpg";
+            string filePath = Path.Combine(folderPath, fileName);
+
+            try
+            {
+                // Salva l'immagine se è presente
+                if (request.profilePic != null)
+                {
+                    // Converti la stringa base64 in byte[]
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await request.profilePic.CopyToAsync(stream);
+                    }
+
+                   
+                }
+
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Profilo modificato con successo" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Errore interno del server: {ex.Message}");
+            }
         }
 
         // Metodo ipotetico per generare un token JWT, da implementare
@@ -174,15 +209,15 @@ namespace Trello.Server.api
         }
 
     }
- 
+
     public class LoginRequest
     {
         public string? name { get; set; }
         public string? username { get; set; }
         public string? password { get; set; }
         public string? token { get; set; }
-
         public string? uid { get; set; }
+        public IFormFile? profilePic { get; set; } // Aggiungi questa proprietà per il binario della foto
     }
 
 

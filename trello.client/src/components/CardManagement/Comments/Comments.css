@@ -1,0 +1,42 @@
+.comments-section {
+    margin-top: 1rem;
+}
+
+.comment {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.add-comment {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+}
+
+.comment-textarea {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    resize: none;
+}
+
+.add-comment-button {
+    align-self: flex-end;
+    padding: 0.1rem 0.1rem;
+    background-color: green;
+    color: white;
+    height: 2rem;
+    width: 4rem;
+    font-size: 0.6rem;
+}
+
+.delete-comment-icon {
+    color: #dc3545;
+    cursor: pointer;
+}
+
+    .delete-comment-icon:hover {
+        color: #a71d2a;
+    }

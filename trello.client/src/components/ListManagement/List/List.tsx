@@ -8,13 +8,20 @@ import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faTrash } from '@fortawesome/free-solid-svg-icons';
 
+interface CardData {
+    uid: string;
+    title: string;
+    description: string;
+    listUid:string,
+}
+
 interface ListProps {
     title: string;
-    cards: { uid: string; title: string; description: string }[];
-    onAddCard: (listUid: string, cardTitle: string, cardDescription: string) => void;
-    onDeleteCard: (listUid: string, cardUid: string) => void;
-    onSaveCard: (listUid: string, cardUid: string, title: string, description: string) => void;
     listUid: string;
+    cards: CardData[];
+    onAddCard: (listUid: string, title: string, description: string) => void;
+    onEditCard: (listUid: string, cardUid: string, title: string, description: string) => void;
+    onDeleteCard: (listUid: string, cardUid: string) => void;
     onDeleteList: (listUid: string) => void;
     onMoveListLeft: (listUid: string) => void;
     onMoveListRight: (listUid: string) => void;
@@ -22,27 +29,27 @@ interface ListProps {
 
 const List: React.FC<ListProps> = ({
     title,
+    listUid,
     cards,
     onAddCard,
+    onEditCard,
     onDeleteCard,
-    onSaveCard,
-    listUid,
     onDeleteList,
     onMoveListLeft,
     onMoveListRight,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedCard, setSelectedCard] = useState<{ uid: string; title: string; description: string } | null>(null);
+    const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     const [cardToDelete, setCardToDelete] = useState<string | null>(null);
 
     const handleAddCard = () => {
-        setSelectedCard(null); // Null indica che stiamo creando una nuova card
+        setSelectedCard(null);
         setIsModalOpen(true);
     };
 
-    const handleEditCard = (card: { uid: string; title: string; description: string }) => {
-        setSelectedCard(card); // Passa la card selezionata per la modifica
+    const handleEditCard = (card: CardData) => {
+        setSelectedCard(card);
         setIsModalOpen(true);
     };
 
@@ -51,9 +58,9 @@ const List: React.FC<ListProps> = ({
         setSelectedCard(null);
     };
 
-    const handleSaveCard = (uid: string, title: string, description: string) => {
+    const handleSaveCard = (listUid: string, uid: string, title: string, description: string) => {
         if (uid) {
-            onSaveCard(listUid, uid, title, description);
+            onEditCard(listUid, uid, title, description);
         } else {
             onAddCard(listUid, title, description);
         }
@@ -98,8 +105,9 @@ const List: React.FC<ListProps> = ({
                                                 uid={card.uid}
                                                 title={card.title}
                                                 description={card.description}
-                                                onSaveCard={(uid, title, description) => handleSaveCard(uid, title, description)}
+                                                listUid={card.listUid }
                                                 onDeleteCard={() => openConfirmModal(card.uid)}
+                                                onSaveCard={handleSaveCard}
                                                 onEditCard={() => handleEditCard(card)}
                                                 isEditing={selectedCard?.uid === card.uid}
                                             />
@@ -112,6 +120,7 @@ const List: React.FC<ListProps> = ({
                     </div>
                 )}
             </Droppable>
+
             <Button onClick={handleAddCard} label="Aggiungi Card" variant="custom" className="bg-blue-500 text-white w-48 mt-4" />
             <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
                 <div className="modal-content">
@@ -119,9 +128,10 @@ const List: React.FC<ListProps> = ({
                         uid={selectedCard?.uid || ''}
                         title={selectedCard?.title || ''}
                         description={selectedCard?.description || ''}
+                        listUid={listUid} 
                         onSaveCard={handleSaveCard}
                         onEditCard={handleCloseModal}
-                        onDeleteCard={() => onDeleteCard(listUid, selectedCard?.uid || '')}
+                        onDeleteCard={() => handleDeleteCardConfirm()}
                         isEditing={true}
                     />
                 </div>

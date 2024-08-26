@@ -6,6 +6,7 @@ import Button from '../../UIComponents/Button/Button';
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errMessage, setErrMessage] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -28,9 +29,9 @@ const Login: React.FC = () => {
             localStorage.setItem('token', data.token); // Salva il token
             localStorage.setItem('uid', data.uid); // Salva l'UID
             localStorage.setItem('username', data.username); // Salva lo username
-            navigate('/board');
+            navigate('/home');
         } else {
-            console.error('Errore durante il login');
+           setErrMessage(response.statusText);
         }
     };
 
@@ -57,7 +58,9 @@ const Login: React.FC = () => {
                         required
                     />
                 </div>
-                <Button type="submit" label="Login" variant="custom" />
+                <Button type="submit" label="Login" variant="custom" /><br></br>
+               
+                <span className="text-red-500">{errMessage}</span>
             </form>
         </div>
     );

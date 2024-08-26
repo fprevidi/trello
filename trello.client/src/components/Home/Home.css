@@ -1,0 +1,11 @@
+.board-container {
+    padding: 2rem;
+    background: linear-gradient(to right, #1e3c72, #2a5298); /* Gradiente blu */
+    height: 100vh;
+    overflow-y: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+

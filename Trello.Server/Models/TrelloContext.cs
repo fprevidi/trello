@@ -66,6 +66,7 @@ public partial class TrelloContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.Uid).HasDefaultValueSql("(NEWID())");
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.Name).HasMaxLength(100);
 
@@ -90,6 +91,8 @@ public partial class TrelloContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.Uid)
+                .HasDefaultValueSql("(NEWID())");
             entity.Property(e => e.DueDate).HasColumnType("datetime");
             entity.Property(e => e.Title).HasMaxLength(100);
 
@@ -152,6 +155,9 @@ public partial class TrelloContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
+            entity.Property(e => e.Uid)
+                .HasDefaultValueSql("(NEWID())");
+
             entity.HasOne(d => d.Card).WithMany(p => p.Comments)
                 .HasForeignKey(d => d.CardId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -173,6 +179,7 @@ public partial class TrelloContext : DbContext
                 .HasForeignKey(d => d.BoardId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Lists__BoardId__29572725");
+            entity.Property(e => e.Uid).HasDefaultValueSql("(NEWID())");
         });
 
         modelBuilder.Entity<Users>(entity =>

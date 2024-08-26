@@ -1,6 +1,10 @@
 {
   "Files": [
     {
+      "Id": "C:\\Users\\fprev\\Documents\\Clienti\\Craon\\Trello\\Trello.Server\\wwwroot\\allegati\\FotoProfilo\\Profilo_a989ed12-26c4-4c52-ba3b-12b238fb0660.jpg",
+      "PackagePath": "staticwebassets\\allegati\\FotoProfilo\\Profilo_a989ed12-26c4-4c52-ba3b-12b238fb0660.jpg"
+    },
+    {
       "Id": "C:\\Users\\fprev\\Documents\\Clienti\\Craon\\Trello\\Trello.Server\\wwwroot\\img\\Allegati\\FotoProfilo\\Profilo_a989ed12-26c4-4c52-ba3b-12b238fb0660.jpg",
       "PackagePath": "staticwebassets\\img\\Allegati\\FotoProfilo\\Profilo_a989ed12-26c4-4c52-ba3b-12b238fb0660.jpg"
     },

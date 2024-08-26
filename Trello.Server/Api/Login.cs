@@ -13,7 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 
 using System.Net.Mail;
 using System.Net; // Per IEmailSender
-
+using Trello.Server.Services;
 namespace Trello.Server.api
 {
     [Route("api/[controller]")]
@@ -23,12 +23,14 @@ namespace Trello.Server.api
         private readonly TrelloContext _context;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
-       
-        public LoginController(TrelloContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        private readonly IJwtService _jwtService;
+
+        public LoginController(TrelloContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IJwtService jwtService)
         {
             _context = context;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _jwtService = jwtService;
         }
 
 
@@ -37,10 +39,14 @@ namespace Trello.Server.api
         [HttpPost]
         public ActionResult<string> Login([FromBody] LoginRequest loginRequest)
         {
+            try
+            {
+
+            
             var utente = _context.Users.FirstOrDefault(a => a.Username == loginRequest.username && a.Password == loginRequest.password);
             if (utente != null)
             {
-                var token = GenerateJwtToken(utente); // Genera un token JWT per l'utente
+                var token = _jwtService.GenerateJwtToken(utente); // Genera un token JWT per l'utente
                 loginRequest.token = token;
                 loginRequest.uid = utente.Uid.ToString();
                 return Ok(loginRequest);
@@ -48,6 +54,11 @@ namespace Trello.Server.api
             else
             {
                 return BadRequest("Utente non trovato o password errata");
+            }
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message + " " + e.InnerException);
             }
         }
         [HttpPost("RecuperoPassword")]
@@ -185,28 +196,29 @@ namespace Trello.Server.api
         }
 
         // Metodo ipotetico per generare un token JWT, da implementare
-        [NonAction]
-        public string GenerateJwtToken(Users utente)
-        {
-            //retrieve FraseSegreta from appsettings.json
-            var secret = _configuration.GetValue<string>("FraseToken");
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(secret); // Assicurati che questa chiave sia complessa e conservata in modo sicuro!
+        //[NonAction]
+        //public string GenerateJwtToken(Users utente)
+        //{
+        //    //retrieve FraseSegreta from appsettings.json
+        //    var secret = _configuration.GetValue<string>("FraseToken");
+        //    var tokenHandler = new JwtSecurityTokenHandler();
+        //    var key = Encoding.ASCII.GetBytes(secret); // Assicurati che questa chiave sia complessa e conservata in modo sicuro!
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-            new Claim(ClaimTypes.Name, utente.Username),
-            // Qui puoi aggiungere altri claims se necessario, come ruoli o altre informazioni dell'utente
-        }),
-                Expires = DateTime.UtcNow.AddDays(7), // Imposta la scadenza del token come preferisci
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
+        //    var tokenDescriptor = new SecurityTokenDescriptor
+        //    {
+        //        Subject = new ClaimsIdentity(new[]
+        //        {
+        //    new Claim(ClaimTypes.Name, utente.Username),
+        //    new Claim(ClaimTypes.NameIdentifier, utente.UserId.ToString()),
+        //    // Qui puoi aggiungere altri claims se necessario, come ruoli o altre informazioni dell'utente
+        //}),
+        //        Expires = DateTime.UtcNow.AddDays(7), // Imposta la scadenza del token come preferisci
+        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        //    };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
+        //    var token = tokenHandler.CreateToken(tokenDescriptor);
+        //    return tokenHandler.WriteToken(token);
+        //}
 
     }
 

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using Microsoft.Extensions.Options;
 using System.Diagnostics.Contracts;
+using Trello.Server.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +38,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
+//.AddJsonOptions(options =>
+//{
+//    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+//    options.JsonSerializerOptions.MaxDepth = 64; // Imposta la profondità massima a 64 se necessario
+//}); 
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
@@ -45,6 +52,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IJwtService, JwtService>(); // Registrare il servizio JWT
 
 builder.Services.AddDbContext<TrelloContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

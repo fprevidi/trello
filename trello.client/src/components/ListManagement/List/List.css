@@ -12,6 +12,7 @@
         margin-top: 0;
         text-align: center;
         flex-grow: 1;
+        color:black;
     }
 .card-preview {
     cursor: pointer;

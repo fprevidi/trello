@@ -18,8 +18,11 @@ public partial class Cards
     public DateTime? DueDate { get; set; }
 
     public int CreatedBy { get; set; }
+    public string? CreatedByName { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public Guid Uid { get; set; }
 
     public virtual ICollection<Attachments> Attachments { get; set; } = new List<Attachments>();
 

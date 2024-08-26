@@ -13,7 +13,11 @@ public partial class Boards
 
     public int CreatedBy { get; set; }
 
+    public string? CreatedByName { get; set; }
+
     public DateTime CreatedAt { get; set; }
+
+    public Guid Uid { get; set; }
 
     public virtual Users CreatedByNavigation { get; set; } = null!;
 

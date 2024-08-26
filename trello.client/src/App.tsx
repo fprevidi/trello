@@ -6,6 +6,7 @@ import Board from './components/BoardManagement/Board/Board';
 import NavBar from './components/Navigation/NavBar/NavBar';
 import SideBar from './components/Navigation/SideBar/SideBar';
 import './App.css';
+import Home from './components/Home/Home';
 
 const App: React.FC = () => {
     return (
@@ -17,10 +18,11 @@ const App: React.FC = () => {
                     <div className="app-content">
                         <Routes>
                             <Route path="/" element={<Login />} />
+                            <Route path="/home" element={<Home />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/board" element={<Board />} />
-                            <Route path="/board/:id" element={<Board />} />
+                            <Route path="/board/:uid" element={<Board />} />
                         </Routes>
                     </div>
                 </div>

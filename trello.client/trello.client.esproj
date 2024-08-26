@@ -13,6 +13,7 @@
     <Folder Include="src\components\BoardManagement\BoardList\" />
     <Folder Include="src\components\CardManagement\CardDetails\" />
     <Folder Include="src\components\CardManagement\CardEdit\" />
+    <Folder Include="src\components\CardManagement\Comments\" />
     <Folder Include="src\components\ListManagement\ListHeader\" />
     <Folder Include="src\components\Navigation\NavBar\" />
     <Folder Include="src\components\Navigation\SideBar\" />

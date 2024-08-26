@@ -13,7 +13,11 @@ public partial class Comments
 
     public string Text { get; set; } = null!;
 
+    public Guid Uid { get; set; }
+
     public DateTime CreatedAt { get; set; }
+
+    public string? CreatedBy { get; set; } = null!;
 
     public virtual Cards Card { get; set; } = null!;
 

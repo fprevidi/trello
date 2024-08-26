@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import './Board.css';
 import List from '../../ListManagement/List/List';
-import Modal from '../../UIComponents/Modal/Modal';
-import Button from '../../UIComponents/Button/Button';
-import ConfirmModal from '../../UIComponents/ConfirmModal/ConfirmModal';
-import Notification from '../../UIComponents/Notification/Notification';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { v4 as uuidv4 } from 'uuid';
+import Modal from '../../UIComponents/Modal/Modal';
+import ConfirmModal from '../../UIComponents/ConfirmModal/ConfirmModal';
+import Button from '../../UIComponents/Button/Button';
 
 interface Card {
     uid: string;
@@ -17,117 +16,120 @@ interface Card {
 
 interface BoardList {
     uid: string;
-    title: string;
+    name: string;
     cards: Card[];
 }
 
 const Board: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const { uid } = useParams<{ uid: string }>();
     const [lists, setLists] = useState<BoardList[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [newListTitle, setNewListTitle] = useState('');
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     const [listToDelete, setListToDelete] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [newListTitle, setNewListTitle] = useState('');
+    const [isDragging, setIsDragging] = useState(false);
+
+    const openConfirmModal = (listUid: string) => {
+        setListToDelete(listUid);
+        setConfirmModalOpen(true);
+    };
 
     useEffect(() => {
-        // Carica i dati della bacheca specifica utilizzando l'id
-        // Questo può essere sostituito con una chiamata API per ottenere i dati della bacheca
-        const fetchBoardData = (boardId: string) => {
-            // Simula il caricamento dei dati della bacheca
-            const fakeData: BoardList[] = [
-                {
-                    uid: uuidv4(),
-                    title: 'To Do',
-                    cards: [
-                        { uid: uuidv4(), title: 'Task 1', description: 'Description 1' },
-                        { uid: uuidv4(), title: 'Task 2', description: 'Description 2' },
-                    ]
-                },
-                {
-                    uid: uuidv4(),
-                    title: 'In Progress',
-                    cards: [
-                        { uid: uuidv4(), title: 'Task 3', description: 'Description 3' },
-                    ]
-                },
-                {
-                    uid: uuidv4(),
-                    title: 'Done',
-                    cards: [
-                        { uid: uuidv4(), title: 'Task 4', description: 'Description 4' },
-                    ]
+        const fetchBoardData = async (uid: string) => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/GetLists/${uid}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
-            ];
+                const data = await response.json();
 
-            // Imposta i dati fittizi come stato
-            setLists(fakeData);
+                const listsWithCards = data.map((list: BoardList) => ({
+                    ...list,
+                    cards: list.cards || [],
+                }));
+
+                setLists(listsWithCards);
+            } catch (error) {
+                console.error('Error fetching lists:', error);
+                setErrorMessage('Errore durante il caricamento delle liste.');
+            }
         };
 
-        fetchBoardData(id!);
-    }, [id]);
+        if (uid && !isDragging) {
+            fetchBoardData(uid);
+        }
+    }, [uid, isDragging]);
 
-    const handleAddList = () => {
-        if (newListTitle.trim() && !lists.some(list => list.title === newListTitle)) {
-            const newList: BoardList = {
-                uid: uuidv4(),
-                title: newListTitle,
-                cards: []
-            };
-            setLists([...lists, newList]);
-            setNewListTitle('');
-            setIsModalOpen(false);
-        } else {
-            setErrorMessage("Una lista con lo stesso titolo esiste già.");
+    const handleAddList = async () => {
+        if (newListTitle.trim() && !lists.some((list) => list.name === newListTitle)) {
+            try {
+                const token = localStorage.getItem('token');
+                const newList: BoardList = {
+                    uid: uuidv4(),
+                    name: newListTitle,
+                    cards: [],
+                };
+
+                const response = await fetch('/api/lists', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: newListTitle,
+                        boardUid: uid,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Errore durante la creazione della lista');
+                }
+
+                const savedList = await response.json();
+                setLists([...lists, { ...savedList, cards: [] }]);
+                setNewListTitle('');
+                setIsModalOpen(false);
+            } catch (error) {
+                console.error('Errore durante la creazione della lista:', error);
+                setErrorMessage('Errore durante la creazione della lista.');
+            }
         }
     };
 
-    const handleAddCard = (listUid: string, cardTitle: string, cardDescription: string) => {
-        setLists(lists.map(list => {
-            if (list.uid === listUid) {
-                return {
-                    ...list,
-                    cards: [...list.cards, { uid: uuidv4(), title: cardTitle, description: cardDescription }]
-                };
-            }
-            return list;
-        }));
-    };
-
-    const handleDeleteCard = (listUid: string, cardUid: string) => {
-        setLists(lists.map(list => {
-            if (list.uid === listUid) {
-                return {
-                    ...list,
-                    cards: list.cards.filter(card => card.uid !== cardUid)
-                };
-            }
-            return list;
-        }));
-    };
-
-    const handleSaveCard = (listUid: string, cardUid: string, title: string, description: string) => {
-        setLists(lists.map(list => {
-            if (list.uid === listUid) {
-                return {
-                    ...list,
-                    cards: list.cards.map(card => card.uid === cardUid ? { ...card, title, description } : card)
-                };
-            }
-            return list;
-        }));
-    };
-
-    const handleDeleteList = () => {
+    const handleDeleteList = async () => {
         if (listToDelete) {
-            setLists(lists.filter(list => list.uid !== listToDelete));
-            setListToDelete(null);
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/lists/${listToDelete}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Errore durante l\'eliminazione della lista');
+                }
+
+                setLists(lists.filter((list) => list.uid !== listToDelete));
+                setListToDelete(null);
+                setConfirmModalOpen(false);
+            } catch (error) {
+                console.error('Errore durante l\'eliminazione della lista:', error);
+                setErrorMessage('Errore durante l\'eliminazione della lista.');
+            }
         }
-        setConfirmModalOpen(false);
     };
 
     const handleMoveListLeft = (listUid: string) => {
-        const index = lists.findIndex(list => list.uid === listUid);
+        const index = lists.findIndex((list) => list.uid === listUid);
         if (index > 0) {
             const newLists = [...lists];
             const [movedList] = newLists.splice(index, 1);
@@ -137,7 +139,7 @@ const Board: React.FC = () => {
     };
 
     const handleMoveListRight = (listUid: string) => {
-        const index = lists.findIndex(list => list.uid === listUid);
+        const index = lists.findIndex((list) => list.uid === listUid);
         if (index < lists.length - 1) {
             const newLists = [...lists];
             const [movedList] = newLists.splice(index, 1);
@@ -146,7 +148,103 @@ const Board: React.FC = () => {
         }
     };
 
+    const handleAddCard = async (listUid: string, title: string, description: string) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/CardCreate', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    listUid,
+                    title,
+                    description,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Errore durante il salvataggio della card');
+            }
+
+            const savedCard = await response.json();
+
+            setLists(lists.map((list) =>
+                list.uid === listUid ? { ...list, cards: [...list.cards, savedCard] } : list
+            ));
+        } catch (error) {
+            console.error('Errore durante il salvataggio della card:', error);
+            setErrorMessage('Errore durante il salvataggio della card.');
+        }
+    };
+
+    const handleEditCard = async (listUid: string, cardUid: string, title: string, description: string) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/CardEdit/${cardUid}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title,
+                    description,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Errore durante l\'aggiornamento della card');
+            }
+
+            const updatedCard = await response.json();
+
+            setLists(lists.map((list) =>
+                list.uid === listUid ? {
+                    ...list,
+                    cards: list.cards.map((card) => card.uid === cardUid ? updatedCard : card),
+                } : list
+            ));
+        } catch (error) {
+            console.error('Errore durante l\'aggiornamento della card:', error);
+            setErrorMessage('Errore durante l\'aggiornamento della card.');
+        }
+    };
+
+    const handleDeleteCard = async (listUid: string, cardUid: string) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/CardDelete/${cardUid}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Errore durante l\'eliminazione della card');
+            }
+
+            setLists(lists.map((list) =>
+                list.uid === listUid ? {
+                    ...list,
+                    cards: list.cards.filter((card) => card.uid !== cardUid),
+                } : list
+            ));
+        } catch (error) {
+            console.error('Errore durante l\'eliminazione della card:', error);
+            setErrorMessage('Errore durante l\'eliminazione della card.');
+        }
+    };
+
+    const onDragStart = () => {
+        setIsDragging(true);
+    };
+
     const onDragEnd = (result: DropResult) => {
+        setIsDragging(false);
+
         const { source, destination } = result;
 
         if (!destination) {
@@ -157,41 +255,56 @@ const Board: React.FC = () => {
             return;
         }
 
-        const sourceListIndex = lists.findIndex(list => list.uid === source.droppableId);
-        const destinationListIndex = lists.findIndex(list => list.uid === destination.droppableId);
+        const sourceListIndex = lists.findIndex((list) => list.uid === source.droppableId);
+        const destinationListIndex = lists.findIndex((list) => list.uid === destination.droppableId);
+
+        if (sourceListIndex === -1 || destinationListIndex === -1) {
+            console.error('List not found');
+            return;
+        }
 
         const sourceList = lists[sourceListIndex];
-        const [movedCard] = sourceList.cards.splice(source.index, 1);
         const destinationList = lists[destinationListIndex];
-        destinationList.cards.splice(destination.index, 0, movedCard);
+
+        if (!sourceList.cards || !destinationList.cards) {
+            console.error('Cards array not found in one of the lists');
+            return;
+        }
+
+        const sourceCardsCopy = Array.from(sourceList.cards);
+        const destinationCardsCopy = Array.from(destinationList.cards);
+
+        const [movedCard] = sourceCardsCopy.splice(source.index, 1);
+
+        if (!movedCard) {
+            console.error('No card moved');
+            return;
+        }
+
+        destinationCardsCopy.splice(destination.index, 0, movedCard);
 
         const newLists = [...lists];
-        newLists[sourceListIndex] = sourceList;
-        newLists[destinationListIndex] = destinationList;
+        newLists[sourceListIndex] = { ...sourceList, cards: sourceCardsCopy };
+        newLists[destinationListIndex] = { ...destinationList, cards: destinationCardsCopy };
 
         setLists(newLists);
     };
 
-    const openConfirmModal = (listUid: string) => {
-        setListToDelete(listUid);
-        setConfirmModalOpen(true);
-    };
-
     return (
         <div className="board-container">
-            {errorMessage && <Notification message={errorMessage} onClose={() => setErrorMessage(null)} />}
-            <Button onClick={() => setIsModalOpen(true)} label="Nuova Lista" variant="custom" className="new-list-button" />
-            <DragDropContext onDragEnd={onDragEnd}>
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
+            <button onClick={() => setIsModalOpen(true)} className="new-list-button">Nuova Lista</button>
+            <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
                 <div className="lists-container">
                     {lists.map((list) => (
                         <List
                             key={list.uid}
                             listUid={list.uid}
-                            title={list.title}
+                            title={list.name}
                             cards={list.cards}
                             onAddCard={handleAddCard}
+                            onEditCard={handleEditCard}
                             onDeleteCard={handleDeleteCard}
-                            onSaveCard={handleSaveCard}
                             onDeleteList={openConfirmModal}
                             onMoveListLeft={handleMoveListLeft}
                             onMoveListRight={handleMoveListRight}

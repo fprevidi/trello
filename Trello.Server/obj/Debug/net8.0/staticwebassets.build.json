@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "f/NQSUOhd4vVcGE3IYsAm5k8ZNot0TJa2rYHt0Pa4ek=",
+  "Hash": "nMWjR+fQRUWMAF3WF90tAXOX6vW2D0mOAuvNf5ly2dI=",
   "Source": "Trello.Server",
   "BasePath": "_content/Trello.Server",
   "Mode": "Default",
@@ -28,6 +28,25 @@
     }
   ],
   "Assets": [
+    {
+      "Identity": "C:\\Users\\fprev\\Documents\\Clienti\\Craon\\Trello\\Trello.Server\\wwwroot\\allegati\\FotoProfilo\\Profilo_a989ed12-26c4-4c52-ba3b-12b238fb0660.jpg",
+      "SourceId": "Trello.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\fprev\\Documents\\Clienti\\Craon\\Trello\\Trello.Server\\wwwroot\\",
+      "BasePath": "_content/Trello.Server",
+      "RelativePath": "allegati/FotoProfilo/Profilo_a989ed12-26c4-4c52-ba3b-12b238fb0660.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\allegati\\FotoProfilo\\Profilo_a989ed12-26c4-4c52-ba3b-12b238fb0660.jpg"
+    },
     {
       "Identity": "C:\\Users\\fprev\\Documents\\Clienti\\Craon\\Trello\\Trello.Server\\wwwroot\\img\\Allegati\\FotoProfilo\\Profilo_a989ed12-26c4-4c52-ba3b-12b238fb0660.jpg",
       "SourceId": "Trello.Server",

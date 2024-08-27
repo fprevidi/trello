@@ -36,9 +36,7 @@ const Board: React.FC = () => {
         setListToDelete(listUid);
         setConfirmModalOpen(true);
     };
-
-    useEffect(() => {
-        const fetchBoardData = async (uid: string) => {
+     const fetchBoardData = async (uid: string) => {
             try {
                 const token = localStorage.getItem('token');
                 const response = await fetch(`/api/GetLists/${uid}`, {
@@ -62,11 +60,13 @@ const Board: React.FC = () => {
                 setErrorMessage('Errore durante il caricamento delle liste.');
             }
         };
+    useEffect(() => {
 
         if (uid && !isDragging) {
             fetchBoardData(uid);
         }
     }, [uid, isDragging]);
+ 
 
     const handleAddList = async () => {
         if (newListTitle.trim() && !lists.some((list) => list.name === newListTitle)) {
@@ -101,9 +101,10 @@ const Board: React.FC = () => {
 
                 } else {
 
-                    const savedList = await response.json();
-                    setLists([...lists, { ...savedList, cards: [] }]);
+                    //const savedList = await response.json();
+                    //setLists([...lists, { ...savedList, cards: [] }]);
                     setNewListTitle('');
+                    if(uid) await fetchBoardData(uid);
                 }
                 setIsModalOpen(false);
             } catch (error) {
@@ -128,7 +129,8 @@ const Board: React.FC = () => {
                     throw new Error('Errore durante l\'eliminazione della lista');
                 }
 
-                setLists(lists.filter((list) => list.uid !== listToDelete));
+                //setLists(lists.filter((list) => list.uid !== listToDelete));
+                if (uid) await fetchBoardData(uid);
                 setListToDelete(null);
                 setConfirmModalOpen(false);
             } catch (error) {
@@ -178,18 +180,19 @@ const Board: React.FC = () => {
                 throw new Error('Errore durante il salvataggio della card');
             }
 
-            const savedCard = await response.json();
+            //const savedCard = await response.json();
 
-            setLists(lists.map((list) =>
-                list.uid === listUid ? { ...list, cards: [...list.cards, savedCard] } : list
-            ));
+            //setLists(lists.map((list) =>
+            //    list.uid === listUid ? { ...list, cards: [...list.cards, savedCard] } : list
+            //));
+            if (uid) await fetchBoardData(uid);
         } catch (error) {
             console.error('Errore durante il salvataggio della card:', error);
             setErrorMessage('Errore durante il salvataggio della card.');
         }
     };
 
-    const handleEditCard = async (listUid: string, cardUid: string, title: string, description: string) => {
+    const handleEditCard = async (cardUid: string, title: string, description: string) => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`/api/CardEdit/${cardUid}`, {
@@ -208,21 +211,23 @@ const Board: React.FC = () => {
                 throw new Error('Errore durante l\'aggiornamento della card');
             }
 
-            const updatedCard = await response.json();
+            //const updatedCard = await response.json();
 
-            setLists(lists.map((list) =>
-                list.uid === listUid ? {
-                    ...list,
-                    cards: list.cards.map((card) => card.uid === cardUid ? updatedCard : card),
-                } : list
-            ));
+            //setLists(lists.map((list) =>
+            //    list.uid === listUid ? {
+            //        ...list,
+            //        cards: list.cards.map((card) => card.uid === cardUid ? updatedCard : card),
+            //    } : list
+            //));
+            if (uid) await fetchBoardData(uid);
+
         } catch (error) {
             console.error('Errore durante l\'aggiornamento della card:', error);
             setErrorMessage('Errore durante l\'aggiornamento della card.');
         }
     };
 
-    const handleDeleteCard = async (listUid: string, cardUid: string) => {
+    const handleDeleteCard = async (cardUid: string) => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`/api/CardDelete/${cardUid}`, {
@@ -236,12 +241,14 @@ const Board: React.FC = () => {
                 throw new Error('Errore durante l\'eliminazione della card');
             }
 
-            setLists(lists.map((list) =>
-                list.uid === listUid ? {
-                    ...list,
-                    cards: list.cards.filter((card) => card.uid !== cardUid),
-                } : list
-            ));
+            //setLists(lists.map((list) =>
+            //    list.uid === listUid ? {
+            //        ...list,
+            //        cards: list.cards.filter((card) => card.uid !== cardUid),
+            //    } : list
+            //));
+            if (uid) await fetchBoardData(uid);
+
         } catch (error) {
             console.error('Errore durante l\'eliminazione della card:', error);
             setErrorMessage('Errore durante l\'eliminazione della card.');

@@ -21,7 +21,7 @@ interface ListProps {
     cards: CardData[];
     onAddCard: (listUid: string, title: string, description: string) => void;
     onEditCard: (listUid: string, cardUid: string, title: string, description: string) => void;
-    onDeleteCard: (listUid: string, cardUid: string) => void;
+    onDeleteCard:(cardUid: string) => void;
     onDeleteList: (listUid: string) => void;
     onMoveListLeft: (listUid: string) => void;
     onMoveListRight: (listUid: string) => void;
@@ -74,7 +74,7 @@ const List: React.FC<ListProps> = ({
 
     const handleDeleteCardConfirm = () => {
         if (cardToDelete) {
-            onDeleteCard(listUid, cardToDelete);
+            onDeleteCard (cardToDelete);
             setCardToDelete(null);
         }
         setConfirmModalOpen(false);

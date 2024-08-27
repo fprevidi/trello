@@ -93,9 +93,6 @@ namespace Trello.Server.Controllers
             newCard.Title = card.Title;
             newCard.Description = card.Description;
             newCard.Position = 0;
-
-
-
             newCard.CreatedAt = DateTime.UtcNow;
             newCard.CreatedByName = _jwtService.GetUserName();
             newCard.CreatedBy = _jwtService.GetUserId();
@@ -132,14 +129,10 @@ namespace Trello.Server.Controllers
         }
 
         // DELETE: api/Cards/5
-        [HttpGet("/api/Card/Delete/{uid:Guid}")]
-        public async Task<IActionResult> DeleteCard(Guid uid)
+        [HttpGet("/api/CardDelete/{uid:Guid}")]
+        public async Task<IActionResult> CardDelete(Guid uid)
         {
-            if (_context.Cards == null)
-            {
-                return NotFound();
-            }
-
+        
             var card = _context.Cards.FirstOrDefault(a => a.Uid == uid);
             if (card == null)
             {
@@ -149,7 +142,7 @@ namespace Trello.Server.Controllers
             _context.Cards.Remove(card);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok();
         }
 
         private bool CardExists(int id)

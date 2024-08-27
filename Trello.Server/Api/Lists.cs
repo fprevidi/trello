@@ -44,7 +44,7 @@ namespace Trello.Server.Controllers
                 {
                     return NotFound();
                 }
-                var lists = await _context.Lists.Include(a => a.Cards).Select(a => new
+                var lists = await _context.Lists.Select(a => new
                 {
 
                     a.Uid,
@@ -55,7 +55,7 @@ namespace Trello.Server.Controllers
                     a.CreatedByName,
                     a.BoardId,
                     a.ListId,
-                    a.Cards
+                    Cards = a.Cards.OrderBy(a=>a.Position).ToList()
                 }).Where(a => a.BoardId == boardId).ToListAsync();
                 if (lists != null)
                 {

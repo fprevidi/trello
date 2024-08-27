@@ -259,7 +259,7 @@ const Board: React.FC = () => {
         setIsDragging(true);
     };
 
-    const onDragEnd = (result: DropResult) => {
+    const onDragEnd = async (result: DropResult) => {
         setIsDragging(false);
 
         const { source, destination } = result;
@@ -289,23 +289,63 @@ const Board: React.FC = () => {
         }
 
         const sourceCardsCopy = Array.from(sourceList.cards);
-        const destinationCardsCopy = Array.from(destinationList.cards);
+        let newLists = [...lists];
 
-        const [movedCard] = sourceCardsCopy.splice(source.index, 1);
+        // Se la card viene spostata all'interno della stessa lista
+        if (source.droppableId === destination.droppableId) {
+            const [movedCard] = sourceCardsCopy.splice(source.index, 1);
+            sourceCardsCopy.splice(destination.index, 0, movedCard);
 
-        if (!movedCard) {
-            console.error('No card moved');
-            return;
+            newLists[sourceListIndex] = { ...sourceList, cards: sourceCardsCopy };
+        } else {
+            const destinationCardsCopy = Array.from(destinationList.cards);
+            const [movedCard] = sourceCardsCopy.splice(source.index, 1);
+
+            if (!movedCard) {
+                console.error('No card moved');
+                return;
+            }
+
+            destinationCardsCopy.splice(destination.index, 0, movedCard);
+
+            newLists[sourceListIndex] = { ...sourceList, cards: sourceCardsCopy };
+            newLists[destinationListIndex] = { ...destinationList, cards: destinationCardsCopy };
         }
 
-        destinationCardsCopy.splice(destination.index, 0, movedCard);
-
-        const newLists = [...lists];
-        newLists[sourceListIndex] = { ...sourceList, cards: sourceCardsCopy };
-        newLists[destinationListIndex] = { ...destinationList, cards: destinationCardsCopy };
-
         setLists(newLists);
+
+        // Prepara i dati per l'API usando newLists
+        const updatedCards = newLists.flatMap(list =>
+            list.cards.map((card, index) => ({
+                cardUid: card.uid,
+                newPosition: index,
+                destinationListUid: list.uid,
+                title: card.title
+            }))
+        );
+
+        // Chiamata all'API per aggiornare l'ordine delle card
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/CardOrder', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedCards),
+            });
+
+            if (!response.ok) {
+                throw new Error('Errore durante l\'aggiornamento dell\'ordine delle card');
+            }
+            if (uid) await fetchBoardData(uid);
+        } catch (error) {
+            console.error('Errore durante l\'aggiornamento dell\'ordine delle card:', error);
+        }
     };
+
+
 
     return (
         <div className="board-container">

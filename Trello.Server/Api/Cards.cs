@@ -33,8 +33,16 @@ namespace Trello.Server.Controllers
             public string Description { get; set; }
         }
 
-        // P
-        // GET: api/Cards?cardId=1
+
+        public class UpdateCardOrderRequest
+        {
+            public Guid CardUid { get; set; }
+            public int NewPosition { get; set; }
+            public Guid DestinationListUid { get; set; }
+
+            public string Title { get; set; }
+        }
+
         [HttpGet("/api/GetCards/{uid:Guid}")]
         public async Task<ActionResult<IEnumerable<Cards>>> GetCards(Guid Uid)
         {
@@ -60,8 +68,8 @@ namespace Trello.Server.Controllers
                     a.CardId,
                     boardId = a.List.BoardId,
                     ListUid = a.List.Uid
-                  
-                }).Where(a => a.boardId == boardId).ToListAsync();
+                                      
+                }).Where(a => a.boardId == boardId).OrderBy(a=>a.ListId).ThenBy(a=>a.Position).ToListAsync();
                 if (cards != null)
                 {
                     return Ok(cards);
@@ -77,7 +85,7 @@ namespace Trello.Server.Controllers
             }
         }
 
-        // POST: api/Cards
+
 
         [HttpPost("/api/CardCreate")]
         public async Task<ActionResult<Cards>> CardCreate(tmpCard card)
@@ -128,7 +136,7 @@ namespace Trello.Server.Controllers
             return Ok("OK");
         }
 
-        // DELETE: api/Cards/5
+
         [HttpGet("/api/CardDelete/{uid:Guid}")]
         public async Task<IActionResult> CardDelete(Guid uid)
         {
@@ -144,16 +152,47 @@ namespace Trello.Server.Controllers
 
             return Ok();
         }
-
-        private bool CardExists(int id)
+      
+        [HttpPost("/api/CardOrder")]
+        public IActionResult UpdateCardOrder([FromBody] List<UpdateCardOrderRequest> requests)
         {
-            return (_context.Cards?.Any(e => e.CardId == id)).GetValueOrDefault();
-        }
+            foreach (var request in requests)
+            {
+                var card = _context.Cards.FirstOrDefault(a=>a.Uid == request.CardUid);
+                if (card == null)
+                {
+                    return NotFound($"Card with UID {request.CardUid} not found");
+                }
 
+                var listId = _context.Lists.FirstOrDefault(x=>x.Uid == request.DestinationListUid).ListId;
+                card.ListId = listId > 0 ? listId : 0;
+                card.Position = request.NewPosition;
+                _context.Update(card);
+
+
+                
+            }
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500, "Errore durante l'aggiornamento dell'ordine delle card");
+            }
+
+            return NoContent();
+        }
+  
+    
+    
+    }
+  
         
       
     }
    
 
   
-    }
+    

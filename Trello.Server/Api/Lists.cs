@@ -26,6 +26,12 @@ namespace Trello.Server.Controllers
             _jwtService = jwtService;
         }
 
+
+        public class insList
+        {
+            public Guid boardUid { get; set; }
+            public string name { get; set; }
+        }
         // GET: api/Lists?cardId=1
         [HttpGet("/api/GetLists/{uid:Guid}")]
         public async Task<ActionResult<IEnumerable<Lists>>> GetLists(Guid Uid)
@@ -69,31 +75,56 @@ namespace Trello.Server.Controllers
         // POST: api/Lists
 
         [HttpPost("/api/ListCreate")]
-        public async Task<ActionResult<Lists>> ListCreate(Lists list)
+        public async Task<ActionResult<Lists>> ListCreate(insList inslist)
         {
-            if (_context.Lists == null)
+            var list = new Lists();
+            try
             {
-                return Problem("Entity set 'TrelloContext.Lists' is null.");
+                if (inslist.boardUid == Guid.Empty)
+                {
+                    return BadRequest("Board ID Vuoto");
+
+                }
+                var board = _context.Boards.FirstOrDefault(a => a.Uid == inslist.boardUid);
+                if (board == null)
+                {
+                    return BadRequest("Board non trovata");
+
+                }
+              
+
+                list.CreatedAt = DateTime.UtcNow;
+                list.CreatedByName = _jwtService.GetUserName();
+                list.CreatedBy = _jwtService.GetUserId();
+                list.BoardId = board.BoardId;
+                list.Name = inslist.name;
+                list.Position = _context.Lists.Max(x => x.Position) > 0 ? _context.Lists.Max(x => x.Position) + 1 : 1;
+                _context.Lists.Add(list);
+                await _context.SaveChangesAsync();
+
+                var listDto = new 
+                {
+                    Uid = list.Uid,
+                    Name = list.Name,
+                    Position = list.Position,
+                    BoardId = list.BoardId
+
+                    // Aggiungi altre proprietà necessarie
+                };
+                return Ok(listDto);
             }
-
-            list.CreatedAt = DateTime.UtcNow;
-            list.CreatedByName = _jwtService.GetUserName();
-            list.CreatedBy = _jwtService.GetUserId();
-            _context.Lists.Add(list);
-            await _context.SaveChangesAsync();
-
-            return Ok("OK");
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        
         }
 
         // DELETE: api/Lists/5
-        [HttpGet("/api/List/Delete/{uid:Guid}")]
+        [HttpGet("/api/ListDelete/{uid:Guid}")]
         public async Task<IActionResult> DeleteList(Guid uid)
         {
-            if (_context.Lists == null)
-            {
-                return NotFound();
-            }
-
+           
             var list = _context.Lists.FirstOrDefault(a => a.Uid == uid);
             if (list == null)
             {

@@ -208,4 +208,6 @@ html, body {
     padding:0px;
     border-radius:5px;
 }
-
+button, [role="button"] {
+    text-align: center;
+}

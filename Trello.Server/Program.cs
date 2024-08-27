@@ -42,7 +42,7 @@ builder.Services.AddControllers();
 //{
 //    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
 //    options.JsonSerializerOptions.MaxDepth = 64; // Imposta la profondità massima a 64 se necessario
-//}); 
+//});
 
 builder.Services.AddSwaggerGen(c =>
 {

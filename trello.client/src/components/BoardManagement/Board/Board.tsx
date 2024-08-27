@@ -7,11 +7,13 @@ import { v4 as uuidv4 } from 'uuid';
 import Modal from '../../UIComponents/Modal/Modal';
 import ConfirmModal from '../../UIComponents/ConfirmModal/ConfirmModal';
 import Button from '../../UIComponents/Button/Button';
+import Swal from 'sweetalert2';
 
 interface Card {
     uid: string;
     title: string;
     description: string;
+    listUid: string;
 }
 
 interface BoardList {
@@ -76,7 +78,7 @@ const Board: React.FC = () => {
                     cards: [],
                 };
 
-                const response = await fetch('/api/lists', {
+                const response = await fetch('/api/ListCreate', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -89,12 +91,20 @@ const Board: React.FC = () => {
                 });
 
                 if (!response.ok) {
-                    throw new Error('Errore durante la creazione della lista');
-                }
+                    setErrorMessage('Errore durante la creazione della lista');
+                    Swal.fire({
+                        title: 'Errore',
+                        text: response.statusText,
+                        icon: 'error',
+                        confirmButtonText: 'Ok',
+                    });
 
-                const savedList = await response.json();
-                setLists([...lists, { ...savedList, cards: [] }]);
-                setNewListTitle('');
+                } else {
+
+                    const savedList = await response.json();
+                    setLists([...lists, { ...savedList, cards: [] }]);
+                    setNewListTitle('');
+                }
                 setIsModalOpen(false);
             } catch (error) {
                 console.error('Errore durante la creazione della lista:', error);
@@ -107,8 +117,8 @@ const Board: React.FC = () => {
         if (listToDelete) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`/api/lists/${listToDelete}`, {
-                    method: 'DELETE',
+                const response = await fetch(`/api/ListDelete/${listToDelete}`, {
+                    method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -292,7 +302,7 @@ const Board: React.FC = () => {
 
     return (
         <div className="board-container">
-            {errorMessage && <div className="error-message">{errorMessage}</div>}
+           {/* {errorMessage && <div className="error-message">{errorMessage}</div>}*/}
             <button onClick={() => setIsModalOpen(true)} className="new-list-button">Nuova Lista</button>
             <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
                 <div className="lists-container">

@@ -41,18 +41,23 @@ namespace Trello.Server.Controllers
         [HttpPost("/api/BoardCreate")]
         public async Task<ActionResult<Boards>> BoardCreate(Boards board)
         {
-            if (_context.Boards == null)
-            {
-                return Problem("Entity set 'TrelloContext.Boards' is null.");
+            try {
+                if (_context.Boards == null)
+                {
+                    return Problem("Entity set 'TrelloContext.Boards' is null.");
+                }
+
+                board.CreatedAt = DateTime.UtcNow;
+                _context.Boards.Add(board);
+                await _context.SaveChangesAsync();
             }
-
-            board.CreatedAt = DateTime.UtcNow;
-            _context.Boards.Add(board);
-            await _context.SaveChangesAsync();
-
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
             return Ok("OK");
 
-        }
+            }
 
         // DELETE: api/Boards/5
         [HttpGet("/api/Board/Delete/{uid:Guid}")]

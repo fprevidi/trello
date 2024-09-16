@@ -3,11 +3,11 @@ import { useParams } from 'react-router-dom';
 import './Board.css';
 import List from '../../ListManagement/List/List';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { v4 as uuidv4 } from 'uuid';
 import Modal from '../../UIComponents/Modal/Modal';
 import ConfirmModal from '../../UIComponents/ConfirmModal/ConfirmModal';
 import Button from '../../UIComponents/Button/Button';
 import Swal from 'sweetalert2';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface Card {
     uid: string;
@@ -25,118 +25,135 @@ interface BoardList {
 const Board: React.FC = () => {
     const { uid } = useParams<{ uid: string }>();
     const [lists, setLists] = useState<BoardList[]>([]);
-    const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [confirmModalOpen, setConfirmModalOpen] = useState<boolean>(false);
     const [listToDelete, setListToDelete] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [newListTitle, setNewListTitle] = useState('');
-    const [isDragging, setIsDragging] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [newListTitle, setNewListTitle] = useState<string>('');
+    const [isDragging, setIsDragging] = useState<boolean>(false);
+    const queryClient = useQueryClient();
 
     const openConfirmModal = (listUid: string) => {
         setListToDelete(listUid);
         setConfirmModalOpen(true);
     };
-     const fetchBoardData = async (uid: string) => {
-            try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(`/api/GetLists/${uid}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
 
-                const listsWithCards = data.map((list: BoardList) => ({
-                    ...list,
-                    cards: list.cards || [],
-                }));
-
-                setLists(listsWithCards);
-            } catch (error) {
-                console.error('Error fetching lists:', error);
-                setErrorMessage('Errore durante il caricamento delle liste.');
-            }
-        };
-    useEffect(() => {
-
-        if (uid && !isDragging) {
-            fetchBoardData(uid);
+    const fetchLists = async (boardUid: string): Promise<BoardList[]> => {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/GetLists/${boardUid}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
-    }, [uid, isDragging]);
- 
+        const data = await response.json();
 
-    const handleAddList = async () => {
-        if (newListTitle.trim() && !lists.some((list) => list.name === newListTitle)) {
-            try {
-                const token = localStorage.getItem('token');
-                const newList: BoardList = {
-                    uid: uuidv4(),
+        const listsWithCards: BoardList[] = data.map((list: BoardList) => ({
+            ...list,
+            cards: list.cards || [],
+        }));
+
+        return listsWithCards;
+    };
+
+    const {
+        data,
+        error,
+        isLoading,
+        isError,
+    } = useQuery<BoardList[], Error>({
+        queryKey: ['lists', uid],
+        queryFn: () => fetchLists(uid!),
+        enabled: !!uid && !isDragging,
+    });
+
+    useEffect(() => {
+        if (data) {
+            setLists(data);
+        }
+    }, [data]);
+
+    useEffect(() => {
+        if (isError && error) {
+            console.error('Error fetching lists:', error);
+            setErrorMessage('Errore durante il caricamento delle liste.');
+        }
+    }, [isError, error]);
+
+    const createListMutation = useMutation<void, Error, void>({
+        mutationFn: async () => {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/ListCreate', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
                     name: newListTitle,
-                    cards: [],
-                };
+                    boardUid: uid,
+                }),
+            });
 
-                const response = await fetch('/api/ListCreate', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: newListTitle,
-                        boardUid: uid,
-                    }),
-                });
-
-                if (!response.ok) {
-                    setErrorMessage('Errore durante la creazione della lista');
-                    Swal.fire({
-                        title: 'Errore',
-                        text: response.statusText,
-                        icon: 'error',
-                        confirmButtonText: 'Ok',
-                    });
-
-                } else {
-
-                    //const savedList = await response.json();
-                    //setLists([...lists, { ...savedList, cards: [] }]);
-                    setNewListTitle('');
-                    if(uid) await fetchBoardData(uid);
-                }
-                setIsModalOpen(false);
-            } catch (error) {
-                console.error('Errore durante la creazione della lista:', error);
-                setErrorMessage('Errore durante la creazione della lista.');
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Errore durante la creazione della lista');
             }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['lists', uid!] });
+            setNewListTitle('');
+            setIsModalOpen(false);
+        },
+        onError: (error: Error) => {
+            console.error('Errore durante la creazione della lista:', error);
+            setErrorMessage('Errore durante la creazione della lista.');
+            Swal.fire({
+                title: 'Errore',
+                text: error.message,
+                icon: 'error',
+                confirmButtonText: 'Ok',
+            });
+        },
+    });
+
+    const handleAddList = () => {
+        if (newListTitle.trim() && !lists.some((list) => list.name === newListTitle)) {
+            createListMutation.mutate();
         }
     };
 
-    const handleDeleteList = async () => {
-        if (listToDelete) {
-            try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(`/api/ListDelete/${listToDelete}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
+    const deleteListMutation = useMutation<void, Error, void>({
+        mutationFn: async () => {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/ListDelete/${listToDelete}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
-                if (!response.ok) {
-                    throw new Error('Errore durante l\'eliminazione della lista');
-                }
-
-                //setLists(lists.filter((list) => list.uid !== listToDelete));
-                if (uid) await fetchBoardData(uid);
-                setListToDelete(null);
-                setConfirmModalOpen(false);
-            } catch (error) {
-                console.error('Errore durante l\'eliminazione della lista:', error);
-                setErrorMessage('Errore durante l\'eliminazione della lista.');
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Errore durante l\'eliminazione della lista');
             }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(['lists', uid]);
+            setListToDelete(null);
+            setConfirmModalOpen(false);
+        },
+        onError: (error: Error) => {
+            console.error('Errore durante l\'eliminazione della lista:', error);
+            setErrorMessage('Errore durante l\'eliminazione della lista.');
+        },
+    });
+
+    const handleDeleteList = () => {
+        if (listToDelete) {
+            deleteListMutation.mutate();
         }
     };
 
@@ -160,13 +177,17 @@ const Board: React.FC = () => {
         }
     };
 
-    const handleAddCard = async (listUid: string, title: string, description: string) => {
-        try {
+    const addCardMutation = useMutation<
+        void,
+        Error,
+        { listUid: string; title: string; description: string }
+    >({
+        mutationFn: async ({ listUid, title, description }) => {
             const token = localStorage.getItem('token');
             const response = await fetch('/api/CardCreate', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
@@ -177,28 +198,35 @@ const Board: React.FC = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Errore durante il salvataggio della card');
+                const errorText = await response.text();
+                throw new Error(errorText || 'Errore durante il salvataggio della card');
             }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['lists', uid!] });
 
-            //const savedCard = await response.json();
-
-            //setLists(lists.map((list) =>
-            //    list.uid === listUid ? { ...list, cards: [...list.cards, savedCard] } : list
-            //));
-            if (uid) await fetchBoardData(uid);
-        } catch (error) {
+        },
+        onError: (error: Error) => {
             console.error('Errore durante il salvataggio della card:', error);
             setErrorMessage('Errore durante il salvataggio della card.');
-        }
+        },
+    });
+
+    const handleAddCard = (listUid: string, title: string, description: string) => {
+        addCardMutation.mutate({ listUid, title, description });
     };
 
-    const handleEditCard = async (cardUid: string, title: string, description: string) => {
-        try {
+    const editCardMutation = useMutation<
+        void,
+        Error,
+        { cardUid: string; title: string; description: string }
+    >({
+        mutationFn: async ({ cardUid, title, description }) => {
             const token = localStorage.getItem('token');
             const response = await fetch(`/api/CardEdit/${cardUid}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
@@ -208,58 +236,92 @@ const Board: React.FC = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Errore durante l\'aggiornamento della card');
+                const errorText = await response.text();
+                throw new Error(errorText || 'Errore durante l\'aggiornamento della card');
             }
-
-            //const updatedCard = await response.json();
-
-            //setLists(lists.map((list) =>
-            //    list.uid === listUid ? {
-            //        ...list,
-            //        cards: list.cards.map((card) => card.uid === cardUid ? updatedCard : card),
-            //    } : list
-            //));
-            if (uid) await fetchBoardData(uid);
-
-        } catch (error) {
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(['lists', uid]);
+        },
+        onError: (error: Error) => {
             console.error('Errore durante l\'aggiornamento della card:', error);
             setErrorMessage('Errore durante l\'aggiornamento della card.');
-        }
+        },
+    });
+
+    const handleEditCard = (cardUid: string, title: string, description: string) => {
+        editCardMutation.mutate({ cardUid, title, description });
     };
 
-    const handleDeleteCard = async (cardUid: string) => {
-        try {
+    const deleteCardMutation = useMutation<void, Error, string>({
+        mutationFn: async (cardUid) => {
             const token = localStorage.getItem('token');
             const response = await fetch(`/api/CardDelete/${cardUid}`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                 },
             });
 
             if (!response.ok) {
-                throw new Error('Errore durante l\'eliminazione della card');
+                const errorText = await response.text();
+                throw new Error(errorText || 'Errore durante l\'eliminazione della card');
             }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['lists', uid!] });
 
-            //setLists(lists.map((list) =>
-            //    list.uid === listUid ? {
-            //        ...list,
-            //        cards: list.cards.filter((card) => card.uid !== cardUid),
-            //    } : list
-            //));
-            if (uid) await fetchBoardData(uid);
-
-        } catch (error) {
+        },
+        onError: (error: Error) => {
             console.error('Errore durante l\'eliminazione della card:', error);
             setErrorMessage('Errore durante l\'eliminazione della card.');
-        }
+        },
+    });
+
+    const handleDeleteCard = (cardUid: string) => {
+        deleteCardMutation.mutate(cardUid);
     };
+
+    const updateCardOrderMutation = useMutation<
+        void,
+        Error,
+        {
+            cardUid: string;
+            newPosition: number;
+            destinationListUid: string;
+            title: string;
+        }[]
+    >({
+        mutationFn: async (updatedCards) => {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/CardOrder', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedCards),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Errore durante l\'aggiornamento dell\'ordine delle card');
+            }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(['lists', uid]);
+        },
+        onError: (error: Error) => {
+            console.error('Errore durante l\'aggiornamento dell\'ordine delle card:', error);
+            setErrorMessage('Errore durante l\'aggiornamento dell\'ordine delle card.');
+        },
+    });
 
     const onDragStart = () => {
         setIsDragging(true);
     };
 
-    const onDragEnd = async (result: DropResult) => {
+    const onDragEnd = (result: DropResult) => {
         setIsDragging(false);
 
         const { source, destination } = result;
@@ -268,12 +330,17 @@ const Board: React.FC = () => {
             return;
         }
 
-        if (source.droppableId === destination.droppableId && source.index === destination.index) {
+        if (
+            source.droppableId === destination.droppableId &&
+            source.index === destination.index
+        ) {
             return;
         }
 
         const sourceListIndex = lists.findIndex((list) => list.uid === source.droppableId);
-        const destinationListIndex = lists.findIndex((list) => list.uid === destination.droppableId);
+        const destinationListIndex = lists.findIndex(
+            (list) => list.uid === destination.droppableId
+        );
 
         if (sourceListIndex === -1 || destinationListIndex === -1) {
             console.error('List not found');
@@ -291,7 +358,6 @@ const Board: React.FC = () => {
         const sourceCardsCopy = Array.from(sourceList.cards);
         let newLists = [...lists];
 
-        // Se la card viene spostata all'interno della stessa lista
         if (source.droppableId === destination.droppableId) {
             const [movedCard] = sourceCardsCopy.splice(source.index, 1);
             sourceCardsCopy.splice(destination.index, 0, movedCard);
@@ -314,43 +380,24 @@ const Board: React.FC = () => {
 
         setLists(newLists);
 
-        // Prepara i dati per l'API usando newLists
-        const updatedCards = newLists.flatMap(list =>
+        const updatedCards = newLists.flatMap((list) =>
             list.cards.map((card, index) => ({
                 cardUid: card.uid,
                 newPosition: index,
                 destinationListUid: list.uid,
-                title: card.title
+                title: card.title,
             }))
         );
 
-        // Chiamata all'API per aggiornare l'ordine delle card
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch('/api/CardOrder', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updatedCards),
-            });
-
-            if (!response.ok) {
-                throw new Error('Errore durante l\'aggiornamento dell\'ordine delle card');
-            }
-            if (uid) await fetchBoardData(uid);
-        } catch (error) {
-            console.error('Errore durante l\'aggiornamento dell\'ordine delle card:', error);
-        }
+        updateCardOrderMutation.mutate(updatedCards);
     };
-
-
 
     return (
         <div className="board-container">
-           {/* {errorMessage && <div className="error-message">{errorMessage}</div>}*/}
-            <button onClick={() => setIsModalOpen(true)} className="new-list-button">Nuova Lista</button>
+            {/* {errorMessage && <div className="error-message">{errorMessage}</div>} */}
+            <button onClick={() => setIsModalOpen(true)} className="new-list-button">
+                Nuova Lista
+            </button>
             <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
                 <div className="lists-container">
                     {lists.map((list) => (
@@ -380,8 +427,18 @@ const Board: React.FC = () => {
                         className="modal-input"
                     />
                     <div className="modal-buttons">
-                        <Button onClick={handleAddList} label="OK" className="mr-4 bg-red-500 text-white w-48" variant="custom" />
-                        <Button onClick={() => setIsModalOpen(false)} label="ANNULLA" className="mr-4 bg-gray-500 text-white w-48" variant="custom" />
+                        <Button
+                            onClick={handleAddList}
+                            label="OK"
+                            className="mr-4 bg-red-500 text-white w-48"
+                            variant="custom"
+                        />
+                        <Button
+                            onClick={() => setIsModalOpen(false)}
+                            label="ANNULLA"
+                            className="mr-4 bg-gray-500 text-white w-48"
+                            variant="custom"
+                        />
                     </div>
                 </div>
             </Modal>

@@ -141,7 +141,7 @@ const Board: React.FC = () => {
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(['lists', uid]);
+            queryClient.invalidateQueries({ queryKey: ['lists', uid!] });
             setListToDelete(null);
             setConfirmModalOpen(false);
         },
@@ -241,7 +241,7 @@ const Board: React.FC = () => {
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(['lists', uid]);
+            queryClient.invalidateQueries({ queryKey: ['lists', uid!] });
         },
         onError: (error: Error) => {
             console.error('Errore durante l\'aggiornamento della card:', error);
@@ -309,7 +309,7 @@ const Board: React.FC = () => {
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(['lists', uid]);
+            queryClient.invalidateQueries({ queryKey: ['lists', uid!] });
         },
         onError: (error: Error) => {
             console.error('Errore durante l\'aggiornamento dell\'ordine delle card:', error);
@@ -416,6 +416,10 @@ const Board: React.FC = () => {
                     ))}
                 </div>
             </DragDropContext>
+
+
+
+           {/*Modale per nuovalista*/}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <div className="modal-content">
                     <h3>Nuova Lista</h3>

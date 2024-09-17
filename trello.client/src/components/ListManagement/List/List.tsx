@@ -120,7 +120,7 @@ const List: React.FC<ListProps> = ({
                     </div>
                 )}
             </Droppable>
-
+            {/*modale per nuova card*/}
             <Button onClick={handleAddCard} label="Aggiungi Card" variant="custom" className="bg-blue-500 text-white w-48 mt-4" />
             <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
                 <div className="modal-content">

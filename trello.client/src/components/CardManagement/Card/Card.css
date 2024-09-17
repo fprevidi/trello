@@ -5,6 +5,17 @@
     border-radius: 4px;
     padding: 1rem;
     margin: 0.5rem 0;
+    max-width:17rem;
+    max-height:13rem;
+    overflow:hidden;
+}
+.card-edit {
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1rem;
+    margin: 0.5rem 0;
 }
 
 .delete-card-icon {
@@ -44,6 +55,7 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
+
 }
 
 .modal-content {
@@ -53,6 +65,7 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     position: relative;
     z-index: 1001;
+   
 }
 
 .comments-section {

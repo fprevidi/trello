@@ -39,9 +39,11 @@ const Card: React.FC<CardProps> = ({
     };
 
     return (
-        <div className="card">
+        <div>
+       
             {isEditing ? (
-                <div>
+                <div className="card-edit">
+                  <div>
                     <input
                         type="text"
                         value={editTitle}
@@ -58,25 +60,29 @@ const Card: React.FC<CardProps> = ({
                         <button onClick={handleSaveCard} className="modal-button save-button">Conferma</button>
                         <button onClick={onEditCard} className="modal-button save-button">Annulla</button>
                     </div>
+                    </div>
                 </div>
             ) : (
-                <div>
-                    <div className="card-content" onClick={onEditCard}>
-                        <h4>{initialTitle}</h4>
-                        <p>{initialDescription}</p>
-                    </div>
-                    <FontAwesomeIcon
-                        icon={faTrash}
-                        className="delete-card-icon"
-                        onClick={(e) => {
-                            e.stopPropagation(); // Previene l'attivazione dell'edit
-                            onDeleteCard();
-                        }}
-                        style={{ color: 'red', position: 'absolute', bottom: '10px', right: '10px' }}
-                    />
+                    <div className="card">
+                            <div>
+                                <div className="card-content" onClick={onEditCard}>
+                                    <h4>{initialTitle}</h4>
+                                    <p>{initialDescription}</p>
+                                </div>
+                                <FontAwesomeIcon
+                                    icon={faTrash}
+                                    className="delete-card-icon"
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Previene l'attivazione dell'edit
+                                        onDeleteCard();
+                                    }}
+                                    style={{ color: 'red', position: 'absolute', bottom: '10px', right: '10px' }}
+                                />
+                        </div>
                 </div>
             )}
-        </div>
+            </div>
+     
     );
 };
 

@@ -6,7 +6,10 @@
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     position: relative;
     margin-bottom: 1rem;
+    flex: 0 0 auto; /* Aggiungi questa regola per evitare che le liste si restringano */
+    height: auto; /* Assicura che l'altezza sia automatica */
 }
+
 
     .list h3 {
         margin-top: 0;
